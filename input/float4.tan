@@ -1,0 +1,4 @@
+main {
+    const r := + 1.23;
+    print r \n;
+}

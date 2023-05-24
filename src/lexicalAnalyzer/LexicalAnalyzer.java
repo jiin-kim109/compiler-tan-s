@@ -79,6 +79,7 @@ public class LexicalAnalyzer extends ScannerImp implements Scanner {
 			LocatedChar next = input.next();
 			if (next.getCharacter() == 'e' || next.getCharacter() == 'E') {
 			}
+			input.pushback(next);
 			return FloatingLiteralToken.make(firstChar, buffer.toString());
 		}
 		else {
