@@ -70,7 +70,7 @@ public class LexicalAnalyzer extends ScannerImp implements Scanner {
 
 		if (input.peek().getCharacter() == DECIMAL_POINT) {
 			LocatedChar decimal = input.next();
-			buffer.append(decimal);
+			buffer.append(decimal.getCharacter());
 			if (!input.peek().isDigit()) {
 				lexicalError("Malformed floating-point literal", decimal);
 				return findNextToken();
@@ -78,10 +78,12 @@ public class LexicalAnalyzer extends ScannerImp implements Scanner {
 			appendSubsequentDigits(buffer);
 			LocatedChar next = input.next();
 			if (next.getCharacter() == 'e' || next.getCharacter() == 'E') {
-				return FloatingLiteralToken.make(firstChar, buffer.toString());
 			}
+			return FloatingLiteralToken.make(firstChar, buffer.toString());
 		}
-		return IntegerLiteralToken.make(firstChar, buffer.toString());
+		else {
+			return IntegerLiteralToken.make(firstChar, buffer.toString());
+		}
 	}
 	private void appendSubsequentDigits(StringBuffer buffer) {
 		LocatedChar c = input.next();

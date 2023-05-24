@@ -2,13 +2,13 @@ package parseTree.nodeTypes;
 
 import parseTree.ParseNode;
 import parseTree.ParseNodeVisitor;
-import tokens.IntegerLiteralToken;
+import tokens.FloatingLiteralToken;
 import tokens.Token;
 
 public class FloatingConstantNode extends ParseNode {
 	public FloatingConstantNode(Token token) {
 		super(token);
-		assert(token instanceof FloatingConstantNode);
+		assert(token instanceof FloatingLiteralToken);
 	}
 	public FloatingConstantNode(ParseNode node) {
 		super(node);
@@ -17,12 +17,12 @@ public class FloatingConstantNode extends ParseNode {
 ////////////////////////////////////////////////////////////
 // attributes
 	
-	public int getValue() {
+	public double getValue() {
 		return numberToken().getValue();
 	}
 
-	public FloatingConstantNode numberToken() {
-		return (FloatingConstantNode)token;
+	public FloatingLiteralToken numberToken() {
+		return (FloatingLiteralToken)token;
 	}	
 
 ///////////////////////////////////////////////////////////
