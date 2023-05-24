@@ -5,12 +5,12 @@ import parseTree.ParseNodeVisitor;
 import tokens.IntegerLiteralToken;
 import tokens.Token;
 
-public class IntegerConstantNode extends ParseNode {
-	public IntegerConstantNode(Token token) {
+public class FloatingConstantNode extends ParseNode {
+	public FloatingConstantNode(Token token) {
 		super(token);
-		assert(token instanceof IntegerLiteralToken);
+		assert(token instanceof FloatingConstantNode);
 	}
-	public IntegerConstantNode(ParseNode node) {
+	public FloatingConstantNode(ParseNode node) {
 		super(node);
 	}
 
@@ -21,8 +21,8 @@ public class IntegerConstantNode extends ParseNode {
 		return numberToken().getValue();
 	}
 
-	public IntegerLiteralToken numberToken() {
-		return (IntegerLiteralToken)token;
+	public FloatingConstantNode numberToken() {
+		return (FloatingConstantNode)token;
 	}	
 
 ///////////////////////////////////////////////////////////

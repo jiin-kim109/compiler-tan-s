@@ -7,15 +7,12 @@ import inputHandler.InputHandler;
 import inputHandler.LocatedChar;
 import inputHandler.LocatedCharStream;
 import inputHandler.PushbackCharStream;
-import tokens.IdentifierToken;
-import tokens.LextantToken;
-import tokens.NullToken;
-import tokens.NumberToken;
-import tokens.Token;
+import tokens.*;
 
 import static lexicalAnalyzer.PunctuatorScanningAids.*;
 
 public class LexicalAnalyzer extends ScannerImp implements Scanner {
+
 	public static LexicalAnalyzer make(String filename) {
 		InputHandler handler = InputHandler.fromFilename(filename);
 		PushbackCharStream charStream = PushbackCharStream.make(handler);
@@ -68,8 +65,23 @@ public class LexicalAnalyzer extends ScannerImp implements Scanner {
 		StringBuffer buffer = new StringBuffer();
 		buffer.append(firstChar.getCharacter());
 		appendSubsequentDigits(buffer);
-		
-		return NumberToken.make(firstChar, buffer.toString());
+
+		if (input.peek().getCharacter() == DECIMAL_POINT) {
+			LocatedChar decimal = input.next();
+			buffer.append(decimal);
+			if (!input.peek().isDigit()) {
+				lexicalError("Malformed floating-point literal", decimal);
+				return findNextToken();
+			}
+			appendSubsequentDigits(buffer);
+			LocatedChar next = input.next();
+			if (next.getCharacter() == 'e' || next.getCharacter() == 'E') {
+				return FloatingLiteralToken.make(firstChar, buffer.toString());
+			}
+		}
+		else {
+			return IntegerLiteralToken.make(firstChar, buffer.toString());
+		}
 	}
 	private void appendSubsequentDigits(StringBuffer buffer) {
 		LocatedChar c = input.next();
@@ -163,5 +175,8 @@ public class LexicalAnalyzer extends ScannerImp implements Scanner {
 		log.severe("Lexical error: invalid character " + ch);
 	}
 
-	
+	private void lexicalError(String errorMsg, LocatedChar decimal) {
+		TanLogger log = TanLogger.getLogger("compiler.lexicalAnalyzer");
+		log.severe("Lexical error: " + errorMsg + " at " + decimal.getLocation());
+	}
 }
