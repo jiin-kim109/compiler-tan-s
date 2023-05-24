@@ -13,6 +13,8 @@ import static lexicalAnalyzer.PunctuatorScanningAids.*;
 
 public class LexicalAnalyzer extends ScannerImp implements Scanner {
 
+	private static final Character DECIMAL_POINT = '.';
+
 	public static LexicalAnalyzer make(String filename) {
 		InputHandler handler = InputHandler.fromFilename(filename);
 		PushbackCharStream charStream = PushbackCharStream.make(handler);
@@ -79,9 +81,7 @@ public class LexicalAnalyzer extends ScannerImp implements Scanner {
 				return FloatingLiteralToken.make(firstChar, buffer.toString());
 			}
 		}
-		else {
-			return IntegerLiteralToken.make(firstChar, buffer.toString());
-		}
+		return IntegerLiteralToken.make(firstChar, buffer.toString());
 	}
 	private void appendSubsequentDigits(StringBuffer buffer) {
 		LocatedChar c = input.next();
