@@ -81,27 +81,22 @@
         Jump         $$general-runtime-error   
         DLabel       $usable-memory-start      
         DLabel       $global-memory-block      
-        DataZ        0                         
+        DataZ        4                         
         Label        $$main                    
-        PushI        1                         
-        PushD        $print-format-integer     
-        Printf                                 
-        PushD        $print-format-newline     
-        Printf                                 
+        PushD        $global-memory-block      
+        PushI        0                         
+        Add                                    %% neg
         PushI        2                         
-        PushD        $print-format-integer     
-        Printf                                 
-        PushD        $print-format-space       
-        Printf                                 
-        PushI        3                         
-        PushD        $print-format-integer     
-        Printf                                 
-        PushD        $print-format-newline     
-        Printf                                 
-        PushI        4                         
-        PushD        $print-format-integer     
-        Printf                                 
-        PushI        5                         
+        PushI        11                        
+        Negate                                 
+        Negate                                 
+        Negate                                 
+        Add                                    
+        StoreI                                 
+        PushD        $global-memory-block      
+        PushI        0                         
+        Add                                    %% neg
+        LoadI                                  
         PushD        $print-format-integer     
         Printf                                 
         PushD        $print-format-newline     

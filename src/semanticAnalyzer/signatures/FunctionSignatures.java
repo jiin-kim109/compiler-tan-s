@@ -8,6 +8,7 @@ import java.util.Map;
 import asmCodeGenerator.codeStorage.ASMOpcode;
 import asmCodeGenerator.operators.IntegerDivideCodeGenerator;
 import lexicalAnalyzer.Punctuator;
+import semanticAnalyzer.types.PrimitiveType;
 import semanticAnalyzer.types.Type;
 import static semanticAnalyzer.types.PrimitiveType.*;
 
@@ -77,8 +78,25 @@ public class FunctionSignatures extends ArrayList<FunctionSignature> {
 		    new FunctionSignature(ASMOpcode.FAdd, FLOATING, FLOATING, FLOATING)
 		);
 
+		new FunctionSignatures(Punctuator.SUBTRACT,
+				new FunctionSignature(ASMOpcode.Nop, INTEGER, INTEGER),
+				new FunctionSignature(ASMOpcode.Nop, FLOATING, FLOATING),
+				new FunctionSignature(ASMOpcode.Add, INTEGER, INTEGER, INTEGER),
+				new FunctionSignature(ASMOpcode.FAdd, FLOATING, FLOATING, FLOATING)
+		);
+
+		new FunctionSignatures(Punctuator.MULTIPLY,
+				new FunctionSignature(ASMOpcode.Multiply, INTEGER, INTEGER, INTEGER),
+				new FunctionSignature(ASMOpcode.Multiply, FLOATING, FLOATING, FLOATING)
+		);
+
 		new FunctionSignatures(Punctuator.DIVIDE,
 				new FunctionSignature(new IntegerDivideCodeGenerator(), INTEGER, INTEGER, INTEGER)
+		);
+
+		new FunctionSignatures(Punctuator.GREATER,
+				new FunctionSignature(ASMOpcode.Nop, INTEGER, INTEGER, BOOLEAN),
+				new FunctionSignature(ASMOpcode.Nop, FLOATING, FLOATING, BOOLEAN)
 		);
 		
 		// First, we use the operator itself (in this case the Punctuator ADD) as the key.

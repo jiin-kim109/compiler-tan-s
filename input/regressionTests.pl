@@ -203,8 +203,8 @@ sub compiledASMFilename {
 	my $directory = dirname($fullPath);
 	my $fileA = basename($fullPath);
 	my $fileBase = substr( $fileA, 0,  -($suffixLength+1));
-#	print "fileBase = $fileBase \n";
-	return "$directory/output/$fileBase.asm";	
+
+	return "$directory/output/$fileBase.asm";
 }
 sub optimizedASMFilename {
 	my $fullPath = $File::Find::name;
