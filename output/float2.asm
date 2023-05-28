@@ -85,28 +85,21 @@
         Jump         $$general-runtime-error   
         DLabel       $usable-memory-start      
         DLabel       $global-memory-block      
-        DataZ        0                         
+        DataZ        8                         
         Label        $$main                    
-        PushI        1                         
-        PushD        $print-format-integer     
-        Printf                                 
-        PushD        $print-format-newline     
-        Printf                                 
-        PushI        2                         
-        PushD        $print-format-integer     
-        Printf                                 
-        PushD        $print-format-space       
-        Printf                                 
-        PushI        3                         
-        PushD        $print-format-integer     
-        Printf                                 
-        PushD        $print-format-newline     
-        Printf                                 
-        PushI        4                         
-        PushD        $print-format-integer     
-        Printf                                 
-        PushI        5                         
-        PushD        $print-format-integer     
+        PushD        $global-memory-block      
+        PushI        0                         
+        Add                                    %% r
+        Label        -Operator-1-args          
+        PushF        3.340000                  
+        PushF        1.240000                  
+        FAdd                                   
+        StoreF                                 
+        PushD        $global-memory-block      
+        PushI        0                         
+        Add                                    %% r
+        LoadF                                  
+        PushD        $print-format-floating    
         Printf                                 
         PushD        $print-format-newline     
         Printf                                 

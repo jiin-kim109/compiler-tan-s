@@ -240,7 +240,7 @@ public class ASMCodeGenerator {
 				ASMCodeFragment fragment = generator.generate(node, childValueCode(node));
 				codeMap.put(node, fragment);
 			}
-			
+			/*
 			if(operator == Punctuator.SUBTRACT) {
 				visitUnaryOperatorNode(node);
 			}
@@ -250,6 +250,7 @@ public class ASMCodeGenerator {
 			else {
 				visitNormalBinaryOperatorNode(node);
 			}
+			 */
 		}
 
 		private List<ASMCodeFragment> childValueCode(OperatorNode node) {

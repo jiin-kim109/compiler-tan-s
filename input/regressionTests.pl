@@ -4,9 +4,9 @@ use Cwd;
 use File::Find;
 use File::Basename;
 
-my $project_location = "C:/Users/Tom/workspace2021";
+my $project_location = "/home/jiin/Desktop/sfu/cmpt-379-compiler";
 my $language_name = "tan";
-my $project_name = "tan-S";
+my $project_name = "cmpt-379-m1";
 my $asm_test_extension = "asmt";
 
 my $cap_language_name = ucfirst($language_name);
@@ -89,7 +89,8 @@ sub compileAndExpectSuccess {
 }
 sub runExpectingOutput {
 	my $asmFile = compiledASMFilename();
-	my $emulatorOutput = `$emulator $asmFile`;
+	#my $emulatorOutput = `$emulator $asmFile`;
+	my $emulatorOutput = `wine $emulator $asmFile`;
 	my $outFile = emulatorOutputFilename();
 
 	if(! -e $asmFile) {
@@ -175,7 +176,7 @@ sub javaRun {
 	my ($jmain_class, $in_filename) = @_;
 	my $java = "java";
 	my $javaCmd = "$java $javaArgs $jmain_class $in_filename" ;
-#	print $javaCmd."\n";
+	print $javaCmd."\n";
 	my $result = system("$javaCmd");
 #	print "javaRun result: "."$result\n";
 	return $result;

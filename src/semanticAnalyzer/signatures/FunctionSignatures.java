@@ -62,8 +62,7 @@ public class FunctionSignatures extends ArrayList<FunctionSignature> {
 		return signatures.acceptingSignature(types);
 	}
 
-	
-	
+
 	/////////////////////////////////////////////////////////////////////////////////
 	// Put the signatures for operators in the following static block.
 	

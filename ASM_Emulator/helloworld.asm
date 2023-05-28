@@ -1,3 +1,6 @@
+PushD   Hello
+Printf
+Halt
 DLabel	Hello
 DataC 	72			// H
 DataC	101			// e
@@ -12,6 +15,3 @@ DataC	108			// l
 DataC	100			// d
 DataC	33			// !
 DataC	0
-PushD   Hello
-Printf
-Halt

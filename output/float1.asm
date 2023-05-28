@@ -87,27 +87,7 @@
         DLabel       $global-memory-block      
         DataZ        0                         
         Label        $$main                    
-        PushI        1                         
-        PushD        $print-format-integer     
-        Printf                                 
-        PushD        $print-format-newline     
-        Printf                                 
-        PushI        2                         
-        PushD        $print-format-integer     
-        Printf                                 
-        PushD        $print-format-space       
-        Printf                                 
-        PushI        3                         
-        PushD        $print-format-integer     
-        Printf                                 
-        PushD        $print-format-newline     
-        Printf                                 
-        PushI        4                         
-        PushD        $print-format-integer     
-        Printf                                 
-        PushI        5                         
-        PushD        $print-format-integer     
-        Printf                                 
-        PushD        $print-format-newline     
+        PushF        3.240000                  
+        PushD        $print-format-floating    
         Printf                                 
         Halt                                   
