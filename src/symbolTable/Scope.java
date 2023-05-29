@@ -62,19 +62,19 @@ public class Scope {
 
 ///////////////////////////////////////////////////////////////////////
 //bindings
-	public Binding createBinding(IdentifierNode identifierNode, Type type) {
+	public Binding createBinding(IdentifierNode identifierNode, Type type, Constancy constancy) {
 		Token token = identifierNode.getToken();
 		symbolTable.errorIfAlreadyDefined(token);
 
 		String lexeme = token.getLexeme();
-		Binding binding = allocateNewBinding(type, token.getLocation(), lexeme);	
+		Binding binding = allocateNewBinding(type, token.getLocation(), lexeme, constancy);
 		symbolTable.install(lexeme, binding);
 
 		return binding;
 	}
-	private Binding allocateNewBinding(Type type, TextLocation textLocation, String lexeme) {
+	private Binding allocateNewBinding(Type type, TextLocation textLocation, String lexeme, Constancy constancy) {
 		MemoryLocation memoryLocation = allocator.allocate(type.getSize());
-		return new Binding(type, textLocation, memoryLocation, lexeme);
+		return new Binding(type, textLocation, memoryLocation, lexeme, constancy);
 	}
 	
 ///////////////////////////////////////////////////////////////////////
