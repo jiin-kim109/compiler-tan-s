@@ -1,0 +1,5 @@
+main {
+    const r := 2;
+    # this is a comment #
+    print r \n;
+}

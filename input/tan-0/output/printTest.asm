@@ -5,6 +5,10 @@
         DataC        37                        %% "%d"
         DataC        100                       
         DataC        0                         
+        DLabel       $print-format-floating    
+        DataC        37                        %% "%f"
+        DataC        102                       
+        DataC        0                         
         DLabel       $print-format-boolean     
         DataC        37                        %% "%s"
         DataC        115                       
@@ -91,6 +95,7 @@
         PushD        $global-memory-block      
         PushI        4                         
         Add                                    %% pennies
+        Label        -Operator-1-args          
         PushI        5                         
         PushI        41                        
         Add                                    
@@ -103,12 +108,16 @@
         PushD        $global-memory-block      
         PushI        12                        
         Add                                    %% value
+        Label        -Operator-5-args          
+        Label        -Operator-4-args          
+        Label        -Operator-2-args          
         PushD        $global-memory-block      
         PushI        8                         
         Add                                    %% dimes
         LoadI                                  
         PushI        10                        
         Multiply                               
+        Label        -Operator-3-args          
         PushD        $global-memory-block      
         PushI        0                         
         Add                                    %% nickels

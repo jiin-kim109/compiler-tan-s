@@ -1,4 +1,4 @@
 main {
-    const r := + 1.23;
+    const r := 3 / 2;
     print r \n;
 }

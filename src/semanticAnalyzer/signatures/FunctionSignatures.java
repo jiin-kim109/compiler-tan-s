@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import asmCodeGenerator.codeStorage.ASMOpcode;
+import asmCodeGenerator.operators.FloatingDivideCodeGenerator;
 import asmCodeGenerator.operators.IntegerDivideCodeGenerator;
 import lexicalAnalyzer.Punctuator;
 import semanticAnalyzer.types.PrimitiveType;
@@ -75,23 +76,32 @@ public class FunctionSignatures extends ArrayList<FunctionSignature> {
 			new FunctionSignature(ASMOpcode.Nop, INTEGER, INTEGER),
 			new FunctionSignature(ASMOpcode.Nop, FLOATING, FLOATING),
 		    new FunctionSignature(ASMOpcode.Add, INTEGER, INTEGER, INTEGER),
+			new FunctionSignature(ASMOpcode.Add, INTEGER, FLOATING, FLOATING),
+			new FunctionSignature(ASMOpcode.Add, FLOATING, INTEGER, FLOATING),
 		    new FunctionSignature(ASMOpcode.FAdd, FLOATING, FLOATING, FLOATING)
 		);
 
 		new FunctionSignatures(Punctuator.SUBTRACT,
-				new FunctionSignature(ASMOpcode.Nop, INTEGER, INTEGER),
-				new FunctionSignature(ASMOpcode.Nop, FLOATING, FLOATING),
+				new FunctionSignature(ASMOpcode.Negate, INTEGER, INTEGER),
+				new FunctionSignature(ASMOpcode.Negate, FLOATING, FLOATING),
 				new FunctionSignature(ASMOpcode.Add, INTEGER, INTEGER, INTEGER),
+				new FunctionSignature(ASMOpcode.Add, INTEGER, FLOATING, FLOATING),
+				new FunctionSignature(ASMOpcode.Add, FLOATING, INTEGER, FLOATING),
 				new FunctionSignature(ASMOpcode.FAdd, FLOATING, FLOATING, FLOATING)
 		);
 
 		new FunctionSignatures(Punctuator.MULTIPLY,
 				new FunctionSignature(ASMOpcode.Multiply, INTEGER, INTEGER, INTEGER),
+				new FunctionSignature(ASMOpcode.Multiply, INTEGER, FLOATING, FLOATING),
+				new FunctionSignature(ASMOpcode.Multiply, FLOATING, INTEGER, FLOATING),
 				new FunctionSignature(ASMOpcode.Multiply, FLOATING, FLOATING, FLOATING)
 		);
 
 		new FunctionSignatures(Punctuator.DIVIDE,
-				new FunctionSignature(new IntegerDivideCodeGenerator(), INTEGER, INTEGER, INTEGER)
+				new FunctionSignature(new IntegerDivideCodeGenerator(), INTEGER, INTEGER, INTEGER),
+				new FunctionSignature(new FloatingDivideCodeGenerator(), INTEGER, FLOATING, FLOATING),
+				new FunctionSignature(new FloatingDivideCodeGenerator(), FLOATING, INTEGER, FLOATING),
+				new FunctionSignature(new FloatingDivideCodeGenerator(), FLOATING, FLOATING, FLOATING)
 		);
 
 		new FunctionSignatures(Punctuator.GREATER,

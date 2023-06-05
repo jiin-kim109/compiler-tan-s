@@ -13,6 +13,7 @@ import semanticAnalyzer.signatures.FunctionSignatures;
 import semanticAnalyzer.types.PrimitiveType;
 import semanticAnalyzer.types.Type;
 import symbolTable.Binding;
+import symbolTable.Binding.Constancy;
 import symbolTable.Scope;
 import tokens.Token;
 
@@ -74,7 +75,7 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		identifier.setType(declarationType);
 		Constancy constancy = (node.getToken().isLextant(Keyword.CONST)) ?
 				Constancy.IS_CONSTANT :
-				Constancy.IS_VARIABLE
+				Constancy.IS_VARIABLE;
 		addBinding(identifier, declarationType, constancy);
 	}
 
@@ -188,6 +189,12 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		logError("operator " + token.getLexeme() + " not defined for types " 
 				 + operandTypes  + " at " + token.getLocation());	
 	}
+
+	private void semanticError(String errorMessage) {
+		TanLogger log = TanLogger.getLogger("compiler.semanticAnalyzer");
+		log.severe("Semantic Error: " + errorMessage);
+	}
+
 	private void logError(String message) {
 		TanLogger log = TanLogger.getLogger("compiler.semanticAnalyzer");
 		log.severe(message);

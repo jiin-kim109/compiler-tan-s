@@ -5,6 +5,10 @@
         DataC        37                        %% "%d"
         DataC        100                       
         DataC        0                         
+        DLabel       $print-format-floating    
+        DataC        37                        %% "%f"
+        DataC        102                       
+        DataC        0                         
         DLabel       $print-format-boolean     
         DataC        37                        %% "%s"
         DataC        115                       
@@ -116,12 +120,19 @@
         PushD        $global-memory-block      
         PushI        24                        
         Add                                    %% value
+        Label        -Operator-10-args         
+        Label        -Operator-9-args          
+        Label        -Operator-7-args          
+        Label        -Operator-5-args          
+        Label        -Operator-3-args          
+        Label        -Operator-1-args          
         PushD        $global-memory-block      
         PushI        0                         
         Add                                    %% toonies
         LoadI                                  
         PushI        200                       
         Multiply                               
+        Label        -Operator-2-args          
         PushD        $global-memory-block      
         PushI        4                         
         Add                                    %% loonies
@@ -129,6 +140,7 @@
         PushI        100                       
         Multiply                               
         Add                                    
+        Label        -Operator-4-args          
         PushD        $global-memory-block      
         PushI        8                         
         Add                                    %% quarters
@@ -136,6 +148,7 @@
         PushI        25                        
         Multiply                               
         Add                                    
+        Label        -Operator-6-args          
         PushD        $global-memory-block      
         PushI        12                        
         Add                                    %% dimes
@@ -143,6 +156,7 @@
         PushI        10                        
         Multiply                               
         Add                                    
+        Label        -Operator-8-args          
         PushD        $global-memory-block      
         PushI        16                        
         Add                                    %% nickels
@@ -167,6 +181,11 @@
         PushD        $global-memory-block      
         PushI        28                        
         Add                                    %% ncoins
+        Label        -Operator-15-args         
+        Label        -Operator-14-args         
+        Label        -Operator-13-args         
+        Label        -Operator-12-args         
+        Label        -Operator-11-args         
         PushD        $global-memory-block      
         PushI        0                         
         Add                                    %% toonies

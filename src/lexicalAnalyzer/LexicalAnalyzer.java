@@ -9,11 +9,11 @@ import inputHandler.LocatedCharStream;
 import inputHandler.PushbackCharStream;
 import tokens.*;
 
+import static inputHandler.LocatedCharStream.*;
 import static lexicalAnalyzer.PunctuatorScanningAids.*;
 
-public class LexicalAnalyzer extends ScannerImp implements Scanner {
 
-	private static final Character DECIMAL_POINT = '.';
+public class LexicalAnalyzer extends ScannerImp implements Scanner {
 
 	public static LexicalAnalyzer make(String filename) {
 		InputHandler handler = InputHandler.fromFilename(filename);
@@ -41,6 +41,10 @@ public class LexicalAnalyzer extends ScannerImp implements Scanner {
 		else if(isPunctuatorStart(ch)) {
 			return PunctuatorScanner.scan(ch, input);
 		}
+		else if(isCommentSymbol(ch)) {
+			skipToEndOfComment();
+			return findNextToken();
+		}
 		else if(isEndOfInput(ch)) {
 			return NullToken.make(ch);
 		}
@@ -57,6 +61,15 @@ public class LexicalAnalyzer extends ScannerImp implements Scanner {
 			ch = input.next();
 		}
 		return ch;
+	}
+
+	private void skipToEndOfComment() {
+		if (input.isEndOfLine())
+			return;
+		LocatedChar ch = input.next();
+		while(!isCommentSymbol(ch) && !input.isEndOfLine()) {
+			ch = input.next();
+		}
 	}
 	
 	
@@ -78,6 +91,7 @@ public class LexicalAnalyzer extends ScannerImp implements Scanner {
 			appendSubsequentDigits(buffer);
 			LocatedChar next = input.next();
 			if (next.getCharacter() == 'e' || next.getCharacter() == 'E') {
+				//TODO
 			}
 			input.pushback(next);
 			return FloatingLiteralToken.make(firstChar, buffer.toString());
@@ -165,8 +179,12 @@ public class LexicalAnalyzer extends ScannerImp implements Scanner {
 		return isPunctuatorStartingCharacter(c);
 	}
 
+	private boolean isCommentSymbol(LocatedChar lc) {
+		return lc.getCharacter() == COMMENT_SYMBOL;
+	}
+
 	private boolean isEndOfInput(LocatedChar lc) {
-		return lc == LocatedCharStream.FLAG_END_OF_INPUT;
+		return lc == FLAG_END_OF_INPUT;
 	}
 	
 	

@@ -1,0 +1,4 @@
+main {
+    const r := "this is a # comment start # string" ;
+    print r \n;
+}

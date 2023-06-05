@@ -1,0 +1,1 @@
+Bad operand type for JumpFalse instruction at location 12.

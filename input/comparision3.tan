@@ -1,0 +1,6 @@
+main {
+    print 2 == 3 \n;
+    print 3 == 3 \n;
+    print 2 != 3 \n;
+    print 2 != 2 \n;
+}
