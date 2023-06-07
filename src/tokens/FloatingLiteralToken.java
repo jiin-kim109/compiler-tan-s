@@ -23,6 +23,6 @@ public class FloatingLiteralToken extends TokenImp {
 	
 	@Override
 	protected String rawString() {
-		return "number, " + value;
+		return "floating number, " + value;
 	}
 }

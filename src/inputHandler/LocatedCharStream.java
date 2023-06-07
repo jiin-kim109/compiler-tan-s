@@ -8,9 +8,6 @@ import java.util.Iterator;
 public class LocatedCharStream implements Iterator<LocatedChar> {
 	public static final char NULL_CHAR = '\0';
 	public static final LocatedChar FLAG_END_OF_INPUT = new LocatedChar(NULL_CHAR, new TextLocation("null", -1, -1));
-	public static final Character DECIMAL_POINT = '.';
-	public static final Character COMMENT_SYMBOL = '#';
-
 	
 	private Iterator<String> inputIterator;
 	private String line;

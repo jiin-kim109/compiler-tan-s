@@ -6,8 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import asmCodeGenerator.codeStorage.ASMOpcode;
-import asmCodeGenerator.operators.FloatingDivideCodeGenerator;
-import asmCodeGenerator.operators.IntegerDivideCodeGenerator;
+import asmCodeGenerator.operators.*;
 import lexicalAnalyzer.Punctuator;
 import semanticAnalyzer.types.PrimitiveType;
 import semanticAnalyzer.types.Type;
@@ -76,18 +75,14 @@ public class FunctionSignatures extends ArrayList<FunctionSignature> {
 			new FunctionSignature(ASMOpcode.Nop, INTEGER, INTEGER),
 			new FunctionSignature(ASMOpcode.Nop, FLOATING, FLOATING),
 		    new FunctionSignature(ASMOpcode.Add, INTEGER, INTEGER, INTEGER),
-			new FunctionSignature(ASMOpcode.Add, INTEGER, FLOATING, FLOATING),
-			new FunctionSignature(ASMOpcode.Add, FLOATING, INTEGER, FLOATING),
 		    new FunctionSignature(ASMOpcode.FAdd, FLOATING, FLOATING, FLOATING)
 		);
 
 		new FunctionSignatures(Punctuator.SUBTRACT,
 				new FunctionSignature(ASMOpcode.Negate, INTEGER, INTEGER),
 				new FunctionSignature(ASMOpcode.Negate, FLOATING, FLOATING),
-				new FunctionSignature(ASMOpcode.Add, INTEGER, INTEGER, INTEGER),
-				new FunctionSignature(ASMOpcode.Add, INTEGER, FLOATING, FLOATING),
-				new FunctionSignature(ASMOpcode.Add, FLOATING, INTEGER, FLOATING),
-				new FunctionSignature(ASMOpcode.FAdd, FLOATING, FLOATING, FLOATING)
+				new FunctionSignature(ASMOpcode.Subtract, INTEGER, INTEGER, INTEGER),
+				new FunctionSignature(ASMOpcode.FSubtract, FLOATING, FLOATING, FLOATING)
 		);
 
 		new FunctionSignatures(Punctuator.MULTIPLY,
@@ -105,8 +100,33 @@ public class FunctionSignatures extends ArrayList<FunctionSignature> {
 		);
 
 		new FunctionSignatures(Punctuator.GREATER,
-				new FunctionSignature(ASMOpcode.Nop, INTEGER, INTEGER, BOOLEAN),
-				new FunctionSignature(ASMOpcode.Nop, FLOATING, FLOATING, BOOLEAN)
+				new FunctionSignature(new GreaterCodeGenerator(), INTEGER, INTEGER, BOOLEAN),
+				new FunctionSignature(new GreaterCodeGenerator(), FLOATING, FLOATING, BOOLEAN)
+		);
+
+		new FunctionSignatures(Punctuator.GREATER_OR_EQUAL,
+				new FunctionSignature(new GreaterEqualCodeGenerator(), INTEGER, INTEGER, BOOLEAN),
+				new FunctionSignature(new GreaterEqualCodeGenerator(), FLOATING, FLOATING, BOOLEAN)
+		);
+
+		new FunctionSignatures(Punctuator.SMALLER,
+				new FunctionSignature(new SmallerCodeGenerator(), INTEGER, INTEGER, BOOLEAN),
+				new FunctionSignature(new SmallerCodeGenerator(), FLOATING, FLOATING, BOOLEAN)
+		);
+
+		new FunctionSignatures(Punctuator.SMALLER_OR_EQUAL,
+				new FunctionSignature(new SmallerEqualCodeGenerator(), INTEGER, INTEGER, BOOLEAN),
+				new FunctionSignature(new SmallerEqualCodeGenerator(), FLOATING, FLOATING, BOOLEAN)
+		);
+
+		new FunctionSignatures(Punctuator.EQUAL,
+				new FunctionSignature(new EqualCodeGenerator(), INTEGER, INTEGER, BOOLEAN),
+				new FunctionSignature(new EqualCodeGenerator(), FLOATING, FLOATING, BOOLEAN)
+		);
+
+		new FunctionSignatures(Punctuator.NOT_EQUAL,
+				new FunctionSignature(new NotEqualCodeGenerator(), INTEGER, INTEGER, BOOLEAN),
+				new FunctionSignature(new NotEqualCodeGenerator(), FLOATING, FLOATING, BOOLEAN)
 		);
 		
 		// First, we use the operator itself (in this case the Punctuator ADD) as the key.

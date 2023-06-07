@@ -1,0 +1,4 @@
+main {
+    const ch := 'tw';
+    print ch \n ;
+}

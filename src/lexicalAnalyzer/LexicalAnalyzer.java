@@ -1,19 +1,24 @@
 package lexicalAnalyzer;
 
 
+import inputHandler.LocatedCharStream;
 import logging.TanLogger;
 
 import inputHandler.InputHandler;
 import inputHandler.LocatedChar;
-import inputHandler.LocatedCharStream;
 import inputHandler.PushbackCharStream;
 import tokens.*;
 
-import static inputHandler.LocatedCharStream.*;
 import static lexicalAnalyzer.PunctuatorScanningAids.*;
 
 
 public class LexicalAnalyzer extends ScannerImp implements Scanner {
+
+	private static final Character DECIMAL_POINT = '.';
+	private static final Character COMMENT_SYMBOL = '#';
+	private static final Character QUOTATION = '\'';
+	private static final Character DOUBLE_QUOTATION = '\"';
+	private static final Character ASCII_OCTAL_SYMBOL = '%';
 
 	public static LexicalAnalyzer make(String filename) {
 		InputHandler handler = InputHandler.fromFilename(filename);
@@ -34,6 +39,12 @@ public class LexicalAnalyzer extends ScannerImp implements Scanner {
 		LocatedChar ch = nextNonWhitespaceChar();
 		if(ch.isDigit()) {
 			return scanNumber(ch);
+		}
+		if(isCharacterSymbol(ch)) {
+			return scanCharacter(ch);
+		}
+		else if(isStringSymbol(ch)) {
+			return scanString(ch);
 		}
 		else if(ch.isLowerCase()) {
 			return scanIdentifier(ch);
@@ -100,6 +111,48 @@ public class LexicalAnalyzer extends ScannerImp implements Scanner {
 			return IntegerLiteralToken.make(firstChar, buffer.toString());
 		}
 	}
+
+	private Token scanCharacter(LocatedChar firstChar) {
+		StringBuffer buffer = new StringBuffer();
+
+		if (firstChar.getCharacter() == ASCII_OCTAL_SYMBOL) {
+			for (int digit=0; digit<3; digit++) {
+				LocatedChar octal = input.next();
+				if (!octal.isOctalDigit()) {
+					lexicalError("Malformed ascii-octal character literal", octal);
+					return findNextToken();
+				}
+				buffer.append(octal.getCharacter());
+			}
+			int octalToDecimal = Integer.parseInt(buffer.toString(), 8);
+			return CharacterLiteralToken.make(firstChar, Integer.toString(octalToDecimal));
+		}
+		else {
+			LocatedChar ch = input.next();
+			buffer.append((int) ch.getCharacter());
+			if (input.peek().getCharacter() != QUOTATION) {
+				lexicalError("Malformed character literal", input.next());
+				return findNextToken();
+			}
+			input.next();
+			return CharacterLiteralToken.make(firstChar, buffer.toString());
+		}
+	}
+
+	private Token scanString(LocatedChar firstChar) {
+		StringBuffer buffer = new StringBuffer();
+		buffer.append(input.next().getCharacter());
+		while(input.peek().getCharacter() != DOUBLE_QUOTATION) {
+			if (isEndOfInput(input.peek())) {
+				lexicalError("Malformed string literal, expecting closing double quotation", input.peek());
+				return findNextToken();
+			}
+			buffer.append(input.next().getCharacter());
+		}
+		input.next();
+		return StringLiteralToken.make(firstChar, buffer.toString());
+	}
+
 	private void appendSubsequentDigits(StringBuffer buffer) {
 		LocatedChar c = input.next();
 		while(c.isDigit()) {
@@ -174,6 +227,14 @@ public class LexicalAnalyzer extends ScannerImp implements Scanner {
 	//////////////////////////////////////////////////////////////////////////////
 	// Character-classification routines specific to tan scanning.	
 
+	private boolean isCharacterSymbol(LocatedChar lc) {
+		return lc.getCharacter() == QUOTATION || lc.getCharacter() == ASCII_OCTAL_SYMBOL;
+	}
+
+	private boolean isStringSymbol(LocatedChar lc) {
+		return lc.getCharacter() == DOUBLE_QUOTATION;
+	}
+
 	private boolean isPunctuatorStart(LocatedChar lc) {
 		char c = lc.getCharacter();
 		return isPunctuatorStartingCharacter(c);
@@ -184,7 +245,7 @@ public class LexicalAnalyzer extends ScannerImp implements Scanner {
 	}
 
 	private boolean isEndOfInput(LocatedChar lc) {
-		return lc == FLAG_END_OF_INPUT;
+		return lc == LocatedCharStream.FLAG_END_OF_INPUT;
 	}
 	
 	

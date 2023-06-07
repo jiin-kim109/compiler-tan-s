@@ -56,6 +56,14 @@ public class LocatedChar implements Locator {
 	public boolean isDigit() {
 		return Character.isDigit(character);
 	}
+	public boolean isOctalDigit() {
+		if (!isDigit())
+			return false;
+		int value = Character.getNumericValue(character);
+		if (value < 0 || value > 7)
+			return false;
+		return true;
+	}
 	public boolean isWhitespace() {
 		return Character.isWhitespace(character);
 	}

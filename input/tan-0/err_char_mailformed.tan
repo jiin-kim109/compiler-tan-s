@@ -1,0 +1,4 @@
+main {
+    const ch := %091;
+    print ch \n ;
+}

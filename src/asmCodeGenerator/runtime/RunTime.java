@@ -7,6 +7,8 @@ public class RunTime {
 	public static final String INTEGER_PRINT_FORMAT   = "$print-format-integer";
 	public static final String FLOATING_PRINT_FORMAT   = "$print-format-floating";
 	public static final String BOOLEAN_PRINT_FORMAT   = "$print-format-boolean";
+	public static final String CHARACTER_PRINT_FORMAT = "$print-format-character";
+	public static final String STRING_PRINT_FORMAT = "$print-format-string";
 	public static final String NEWLINE_PRINT_FORMAT   = "$print-format-newline";
 	public static final String SPACE_PRINT_FORMAT     = "$print-format-space";
 	public static final String BOOLEAN_TRUE_STRING    = "$boolean-true-string";
@@ -18,6 +20,7 @@ public class RunTime {
 	public static final String GENERAL_RUNTIME_ERROR = "$$general-runtime-error";
 	public static final String INTEGER_DIVIDE_BY_ZERO_RUNTIME_ERROR = "$$i-divide-by-zero";
 	public static final String FLOATING_DIVIDE_BY_ZERO_RUNTIME_ERROR = "$$f-divide-by-zero";
+	public static final String BAD_COMPARISON_OPERAND_RUNTIME_ERROR = "$$bad-comparison-operand";
 
 	private ASMCodeFragment environmentASM() {
 		ASMCodeFragment result = new ASMCodeFragment(GENERATES_VOID);
@@ -44,6 +47,10 @@ public class RunTime {
 		frag.add(DataS, "%f");
 		frag.add(DLabel, BOOLEAN_PRINT_FORMAT);
 		frag.add(DataS, "%s");
+		frag.add(DLabel, CHARACTER_PRINT_FORMAT);
+		frag.add(DataS, "%c");
+		frag.add(DLabel, STRING_PRINT_FORMAT);
+		frag.add(DataS, "%s");
 		frag.add(DLabel, NEWLINE_PRINT_FORMAT);
 		frag.add(DataS, "\n");
 		frag.add(DLabel, SPACE_PRINT_FORMAT);
@@ -62,6 +69,8 @@ public class RunTime {
 		
 		generalRuntimeError(frag);
 		integerDivideByZeroError(frag);
+		floatingDivideByZeroError(frag);
+		badOperandError(frag);
 		
 		return frag;
 	}
@@ -85,6 +94,28 @@ public class RunTime {
 		
 		frag.add(Label, INTEGER_DIVIDE_BY_ZERO_RUNTIME_ERROR);
 		frag.add(PushD, intDivideByZeroMessage);
+		frag.add(Jump, GENERAL_RUNTIME_ERROR);
+	}
+
+	private void floatingDivideByZeroError(ASMCodeFragment frag) {
+		String floatDivideByZeroMessage = "$errors-float-divide-by-zero";
+
+		frag.add(DLabel, floatDivideByZeroMessage);
+		frag.add(DataS, "integer divide by zero");
+
+		frag.add(Label, FLOATING_DIVIDE_BY_ZERO_RUNTIME_ERROR);
+		frag.add(PushD, floatDivideByZeroMessage);
+		frag.add(Jump, GENERAL_RUNTIME_ERROR);
+	}
+
+	private void badOperandError(ASMCodeFragment frag) {
+		String badComparisonOperandMessage = "$errors-bad-comparison-operand";
+
+		frag.add(DLabel, badComparisonOperandMessage);
+		frag.add(DataS, "bad comparison operand");
+
+		frag.add(Label, BAD_COMPARISON_OPERAND_RUNTIME_ERROR);
+		frag.add(PushD, badComparisonOperandMessage);
 		frag.add(Jump, GENERAL_RUNTIME_ERROR);
 	}
 	

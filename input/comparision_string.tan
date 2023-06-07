@@ -1,0 +1,9 @@
+main {
+    const a := "first string" ;
+    const b := "second string" ;
+    const c := a ;
+    print a == b \n ;
+    print a != b \n ;
+    print a == c \n ;
+    print a != c \n ;
+}

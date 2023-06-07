@@ -139,7 +139,13 @@ public class ASMCodeGenerator {
 			}
 			else if(node.getType() == PrimitiveType.BOOLEAN) {
 				code.add(LoadC);
-			}	
+			}
+			else if(node.getType() == PrimitiveType.CHARACTER) {
+				code.add(LoadC);
+			}
+			else if(node.getType() == PrimitiveType.STRING) {
+				code.add(LoadI);
+			}
 			else {
 				assert false : "node " + node;
 			}
@@ -201,12 +207,30 @@ public class ASMCodeGenerator {
 			Type type = node.getType();
 			code.add(opcodeForStore(type));
 		}
+		public void visitLeave(AssignmentStatementNode node) {
+			newVoidCode(node);
+			ASMCodeFragment lvalue = removeAddressCode(node.child(0));
+			ASMCodeFragment rvalue = removeValueCode(node.child(1));
+
+			code.append(lvalue);
+			code.append(rvalue);
+
+			Type type = node.getType();
+			code.add(opcodeForStore(type));
+		}
+
 		private ASMOpcode opcodeForStore(Type type) {
 			if(type == PrimitiveType.INTEGER) {
 				return StoreI;
 			}
 			if(type == PrimitiveType.FLOATING) {
 				return StoreF;
+			}
+			if(type == PrimitiveType.CHARACTER) {
+				return StoreC;
+			}
+			if(type == PrimitiveType.STRING) {
+				return StoreI;
 			}
 			if(type == PrimitiveType.BOOLEAN) {
 				return StoreC;
@@ -346,6 +370,27 @@ public class ASMCodeGenerator {
 
 			code.add(PushI, node.getValue());
 		}
+
+		public void visit(CharacterConstantNode node) {
+			newValueCode(node);
+
+			code.add(PushI, node.getValue());
+		}
+
+		public void visit(StringConstantNode node) {
+			newAddressCode(node);
+			String address = node.getValue().replaceAll("\\s+","");
+
+			code.add(DLabel, address);
+			code.add(DataI, 3);
+			code.add(DataI, 9);
+			code.add(DataI, node.getValue().length());
+			node.getValue().chars().forEach(ch -> code.add(DataC, ch));
+			code.add(DataC, 0);
+
+			code.add(PushD, address);
+		}
+
 		public void visit(FloatingConstantNode node) {
 			newValueCode(node);
 

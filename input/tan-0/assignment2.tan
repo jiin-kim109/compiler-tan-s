@@ -1,0 +1,7 @@
+main {
+    var r := 3.1;
+    r := 5.1 ;
+    print r \n;
+    r := 10.0 + 3.1 - 4.4 ;
+    print r \n;
+}

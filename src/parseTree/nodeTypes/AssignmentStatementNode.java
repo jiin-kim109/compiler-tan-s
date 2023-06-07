@@ -32,9 +32,9 @@ public class AssignmentStatementNode extends ParseNode {
 	////////////////////////////////////////////////////////////
 	// convenience factory
 	
-	public static AssignmentStatementNode withChildren(Token token, ParseNode declaredName, ParseNode expression) {
+	public static AssignmentStatementNode withChildren(Token token, ParseNode identifier, ParseNode expression) {
 		AssignmentStatementNode node = new AssignmentStatementNode(token);
-		node.appendChild(declaredName);
+		node.appendChild(identifier);
 		node.appendChild(expression);
 		return node;
 	}

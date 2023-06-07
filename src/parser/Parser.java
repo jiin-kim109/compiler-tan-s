@@ -93,11 +93,15 @@ public class Parser {
 		if(startsPrintStatement(nowReading)) {
 			return parsePrintStatement();
 		}
+		if(startsAssignment(nowReading)) {
+			return parseAssignment();
+		}
 		return syntaxErrorNode("statement");
 	}
 	private boolean startsStatement(Token token) {
 		return startsPrintStatement(token) ||
-			   startsDeclaration(token);
+			   	startsDeclaration(token) ||
+				startsAssignment(token);
 	}
 	
 	// printStmt -> PRINT printExpressionList TERMINATOR
@@ -153,7 +157,6 @@ public class Parser {
 			parent.appendChild(child);
 			return;
 		}
-		
 		if(nowReading.isLextant(Punctuator.PRINT_NEWLINE)) {
 			readToken();
 			ParseNode child = new NewlineNode(previouslyRead);
@@ -180,7 +183,7 @@ public class Parser {
 		}
 		Token declarationToken = nowReading;
 		readToken();
-		
+
 		ParseNode identifier = parseIdentifier();
 		expect(Punctuator.ASSIGN);
 		ParseNode initializer = parseExpression();
@@ -189,10 +192,25 @@ public class Parser {
 		return DeclarationNode.withChildren(declarationToken, identifier, initializer);
 	}
 	private boolean startsDeclaration(Token token) {
-		return token.isLextant(Keyword.CONST);
+		return token.isLextant(Keyword.CONST, Keyword.VAR);
 	}
 
+	// assignment -> identifier := expression TERMINATOR
+	private ParseNode parseAssignment() {
+		if (!startsAssignment(nowReading)) {
+			return syntaxErrorNode("assignment");
+		}
+		ParseNode identifier = parseIdentifier();
+		expect(Punctuator.ASSIGN);
+		Token assignmentToken = previouslyRead;
+		ParseNode initializer = parseExpression();
+		expect(Punctuator.TERMINATOR);
 
+		return AssignmentStatementNode.withChildren(assignmentToken, identifier, initializer);
+	}
+	private boolean startsAssignment(Token token) {
+		return startsIdentifier(token);
+	}
 	
 	///////////////////////////////////////////////////////////
 	// expressions
@@ -205,7 +223,7 @@ public class Parser {
 	// literal                  -> intNumber | identifier | booleanConstant
 
 	// expr  -> comparisonExpression
-	private ParseNode parseExpression() {		
+	private ParseNode parseExpression() {
 		if(!startsExpression(nowReading)) {
 			return syntaxErrorNode("expression");
 		}
@@ -244,7 +262,7 @@ public class Parser {
 		}
 		
 		ParseNode left = parseMultiplicativeExpression();
-		while(nowReading.isLextant(Punctuator.ADD)) {
+		while(nowReading.isLextant(Punctuator.ADD, Punctuator.SUBTRACT)) {
 			Token additiveToken = nowReading;
 			readToken();
 			ParseNode right = parseMultiplicativeExpression();
@@ -312,12 +330,17 @@ public class Parser {
 			return syntaxErrorNode("literal");
 		}
 
-
 		if(startsIntLiteral(nowReading)) {
 			return parseIntLiteral();
 		}
 		if(startsFloatLiteral(nowReading)) {
 			return parseFloatLiteral();
+		}
+		if(startsCharLiteral(nowReading)) {
+			return parseCharLiteral();
+		}
+		if(startsStringLiteral(nowReading)) {
+			return parseStringLiteral();
 		}
 		if(startsIdentifier(nowReading)) {
 			return parseIdentifier();
@@ -329,7 +352,12 @@ public class Parser {
 		return syntaxErrorNode("literal");
 	}
 	private boolean startsLiteral(Token token) {
-		return startsIntLiteral(token) || startsFloatLiteral(token) || startsIdentifier(token) || startsBooleanLiteral(token);
+		return startsIntLiteral(token) ||
+				startsFloatLiteral(token) ||
+				startsCharLiteral(token) ||
+				startsStringLiteral(token) ||
+				startsIdentifier(token) ||
+				startsBooleanLiteral(token);
 	}
 
 	// number (literal)
@@ -340,6 +368,31 @@ public class Parser {
 		readToken();
 		return new IntegerConstantNode(previouslyRead);
 	}
+
+	private ParseNode parseFloatLiteral() {
+		if (!startsFloatLiteral(nowReading)) {
+			return syntaxErrorNode("floating constant");
+		}
+		readToken();
+		return new FloatingConstantNode(previouslyRead);
+	}
+
+	private ParseNode parseCharLiteral() {
+		if (!startsCharLiteral(nowReading)) {
+			return syntaxErrorNode("character constant");
+		}
+		readToken();
+		return new CharacterConstantNode(previouslyRead);
+	}
+
+	private ParseNode parseStringLiteral() {
+		if (!startsStringLiteral(nowReading)) {
+			return syntaxErrorNode("string constant");
+		}
+		readToken();
+		return new StringConstantNode(previouslyRead);
+	}
+
 	private boolean startsIntLiteral(Token token) {
 		return token instanceof IntegerLiteralToken;
 	}
@@ -348,12 +401,12 @@ public class Parser {
 		return token instanceof FloatingLiteralToken;
 	}
 
-	private ParseNode parseFloatLiteral() {
-		if (!startsFloatLiteral(nowReading)) {
-			return syntaxErrorNode("floating constant");
-		}
-		readToken();
-		return new FloatingConstantNode(previouslyRead);
+	private boolean startsCharLiteral(Token token) {
+		return token instanceof CharacterLiteralToken;
+	}
+
+	private boolean startsStringLiteral(Token token) {
+		return token instanceof StringLiteralToken;
 	}
 
 	// identifier (terminal)

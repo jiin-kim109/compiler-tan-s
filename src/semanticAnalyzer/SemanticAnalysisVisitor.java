@@ -153,6 +153,10 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		node.setType(PrimitiveType.FLOATING);
 	}
 	@Override
+	public void visit(CharacterConstantNode node) { node.setType(PrimitiveType.CHARACTER); }
+	@Override
+	public void visit(StringConstantNode node) { node.setType(PrimitiveType.STRING); }
+	@Override
 	public void visit(NewlineNode node) {
 	}
 	@Override

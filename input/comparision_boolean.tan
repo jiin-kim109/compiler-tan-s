@@ -1,0 +1,9 @@
+main {
+    const a := true ;
+    const b := false ;
+    const c := true ;
+    print a == b \n ;
+    print a != b \n ;
+    print a == c \n ;
+    print a != c \n ;
+}

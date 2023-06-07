@@ -1,0 +1,5 @@
+main {
+    const a := "first string   " ;
+    var b = a ;
+    print b \n;
+}
