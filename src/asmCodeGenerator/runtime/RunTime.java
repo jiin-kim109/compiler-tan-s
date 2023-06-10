@@ -57,7 +57,7 @@ public class RunTime {
 		frag.add(DLabel, SPACE_PRINT_FORMAT);
 		frag.add(DataS, " ");
 		frag.add(DLabel, HORIZONTAL_TAB_PRINT_FORMAT);
-		frag.add(DataS, "    ");
+		frag.add(DataS, "\t");
 		frag.add(DLabel, BOOLEAN_TRUE_STRING);
 		frag.add(DataS, "true");
 		frag.add(DLabel, BOOLEAN_FALSE_STRING);
