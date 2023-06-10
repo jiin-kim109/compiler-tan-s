@@ -88,3 +88,6 @@ for success_file in success_files:
 print("\n")
 for failed_file in failed_files:
     print(failed_file)
+
+if len(failed_files) == 0:
+    print("ALL TEST PASSED!")

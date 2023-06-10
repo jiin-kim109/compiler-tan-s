@@ -1,1 +1,1 @@
-Runtime error: floating divide by zero
+Runtime error: float divide by zero
