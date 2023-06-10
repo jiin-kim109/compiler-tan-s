@@ -209,7 +209,9 @@ public class LexicalAnalyzer extends ScannerImp implements Scanner {
 				buffer.append(next.getCharacter());
 			}
 
-			PrimitiveType type = PrimitiveType.forLexeme(buffer.substring(1, buffer.length()-1));
+			Keyword typeKeyword = Keyword.forLexeme(buffer.substring(1, buffer.length()-1));
+			PrimitiveType type = Keyword.toPrimitive(typeKeyword);
+
 			if (type != PrimitiveType.NO_TYPE && Punctuator.GREATER.equals(next.getCharacter())) {
 				return LextantToken.make(firstChar, buffer.toString(), Punctuator.TYPE_CAST);
 			}

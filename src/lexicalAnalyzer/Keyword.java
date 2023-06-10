@@ -1,6 +1,7 @@
 package lexicalAnalyzer;
 
 import inputHandler.TextLocation;
+import semanticAnalyzer.types.PrimitiveType;
 import tokens.LextantToken;
 import tokens.Token;
 
@@ -12,6 +13,11 @@ public enum Keyword implements Lextant {
 	TRUE("true"),
 	FALSE("false"),
 	MAIN("main"),
+	INT_TYPE("int"),
+	FLOATING_TYPE("float"),
+	BOOLEAN_TYPE("bool"),
+	CHARACTER_TYPE("char"),
+	STRING_TYPE("string"),
 	NULL_KEYWORD("");
 
 	private String lexeme;
@@ -37,6 +43,18 @@ public enum Keyword implements Lextant {
 		}
 		return NULL_KEYWORD;
 	}
+
+	public static PrimitiveType toPrimitive(Keyword keyword) {
+		return switch (keyword.lexeme) {
+			case "int" -> PrimitiveType.INTEGER;
+			case "char" -> PrimitiveType.CHARACTER;
+			case "bool" -> PrimitiveType.BOOLEAN;
+			case "float" -> PrimitiveType.FLOATING;
+			case "string" -> PrimitiveType.STRING;
+			default -> PrimitiveType.NO_TYPE;
+		};
+	}
+
 	public static boolean isAKeyword(String lexeme) {
 		return forLexeme(lexeme) != NULL_KEYWORD;
 	}

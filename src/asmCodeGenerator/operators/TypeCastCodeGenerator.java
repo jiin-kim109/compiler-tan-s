@@ -15,7 +15,7 @@ public class TypeCastCodeGenerator extends ComparisonCodeGenerator {
     @Override
     public ASMCodeFragment generate(ParseNode node, List<ASMCodeFragment> args) {
         assert(node.child(0) instanceof TypecastNode);
-        assert(((TypecastNode) node.child(0)).castingType() != PrimitiveType.NO_TYPE);
+        assert(((TypecastNode) node.child(0)).primitiveType() != PrimitiveType.NO_TYPE);
 
         ASMCodeFragment result = new ASMCodeFragment(ASMCodeFragment.CodeType.GENERATES_VALUE);
         for (ASMCodeFragment arg : args) {

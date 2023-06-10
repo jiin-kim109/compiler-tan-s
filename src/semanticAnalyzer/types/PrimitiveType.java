@@ -29,15 +29,4 @@ public enum PrimitiveType implements Type {
 	public String infoString() {
 		return infoString;
 	}
-
-	public static PrimitiveType forLexeme(String lexeme) {
-		return switch (lexeme) {
-			case "int" -> PrimitiveType.INTEGER;
-			case "char" -> PrimitiveType.CHARACTER;
-			case "bool" -> PrimitiveType.BOOLEAN;
-			case "float" -> PrimitiveType.FLOATING;
-			case "string" -> PrimitiveType.STRING;
-			default -> PrimitiveType.NO_TYPE;
-		};
-	}
 }
