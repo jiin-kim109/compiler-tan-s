@@ -1,1 +1,1 @@
-Bad operand type for Divide instruction at location 13.
+Bad operand type for Divide instruction at location 17.

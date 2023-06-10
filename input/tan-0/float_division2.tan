@@ -1,4 +1,0 @@
-main {
-    const r := 3 / 2.0;
-    print r \n;
-}

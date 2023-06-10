@@ -1,0 +1,6 @@
+main {
+	const r := 3;
+	print r \n;
+	const Rr@_3409433 := 1;
+	print Rr@_3409433 \n;
+}

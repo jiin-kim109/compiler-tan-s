@@ -2,6 +2,7 @@ package tokens;
 
 import lexicalAnalyzer.Lextant;
 import inputHandler.Locator;
+import semanticAnalyzer.types.PrimitiveType;
 
 public final class LextantToken extends TokenImp {
 
@@ -22,6 +23,7 @@ public final class LextantToken extends TokenImp {
 		}
 		return false;
 	}
+
 	protected String rawString() {
 		return lextant.toString();
 	}

@@ -1,0 +1,4 @@
+main {
+    const r := -1.0E+400;
+    print r \n;
+}

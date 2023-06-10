@@ -25,7 +25,10 @@ public class EqualCodeGenerator extends ComparisonCodeGenerator {
         String joinLabel  = labeller.newLabel("join");
 
         Type operandType = operandType(node);
-        if (operandType == PrimitiveType.INTEGER) {
+        if (operandType == PrimitiveType.INTEGER ||
+                operandType == PrimitiveType.CHARACTER ||
+                operandType == PrimitiveType.STRING ||
+                operandType == PrimitiveType.BOOLEAN) {
             result.add(ASMOpcode.Subtract);
             result.add(ASMOpcode.JumpFalse, trueLabel);
             result.add(ASMOpcode.Jump, falseLabel);

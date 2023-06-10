@@ -47,7 +47,7 @@ public class PunctuatorScanner {
 			backupToLastPunctuatorPrefix();
 			return scanned.asToken();
 		}
-		
+
 		scanned.add(input.next());
 		return scanPunctuator();
 	}

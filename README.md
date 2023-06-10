@@ -12,7 +12,7 @@ Run the python script to compile all ASM outputs at once
 python3 input/ASM_runner.py
 `
 
-**Running ASMEmu.exe on Ubuntu**  
+**Running a single ASM file with ASMEmu.exe on Ubuntu**  
 `
 wine ASM_Emulator/ASMEmu.exe [FILE_PATH]
 `  

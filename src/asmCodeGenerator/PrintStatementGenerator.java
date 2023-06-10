@@ -1,11 +1,7 @@
 package asmCodeGenerator;
 
-import static asmCodeGenerator.codeStorage.ASMOpcode.Jump;
-import static asmCodeGenerator.codeStorage.ASMOpcode.JumpTrue;
-import static asmCodeGenerator.codeStorage.ASMOpcode.Label;
-import static asmCodeGenerator.codeStorage.ASMOpcode.Printf;
-import static asmCodeGenerator.codeStorage.ASMOpcode.PushD;
 import parseTree.ParseNode;
+import parseTree.nodeTypes.HorizontalTabNode;
 import parseTree.nodeTypes.NewlineNode;
 import parseTree.nodeTypes.PrintStatementNode;
 import parseTree.nodeTypes.SpaceNode;
@@ -14,6 +10,8 @@ import semanticAnalyzer.types.Type;
 import asmCodeGenerator.ASMCodeGenerator.CodeVisitor;
 import asmCodeGenerator.codeStorage.ASMCodeFragment;
 import asmCodeGenerator.runtime.RunTime;
+
+import static asmCodeGenerator.codeStorage.ASMOpcode.*;
 
 public class PrintStatementGenerator {
 	ASMCodeFragment code;
@@ -28,7 +26,7 @@ public class PrintStatementGenerator {
 
 	public void generate(PrintStatementNode node) {
 		for(ParseNode child : node.getChildren()) {
-			if(child instanceof NewlineNode || child instanceof SpaceNode) {
+			if(isPrintFormatNode(child)) {
 				ASMCodeFragment childCode = visitor.removeVoidCode(child);
 				code.append(childCode);
 			}
@@ -38,11 +36,16 @@ public class PrintStatementGenerator {
 		}
 	}
 
+	private boolean isPrintFormatNode(ParseNode node) {
+		return node instanceof NewlineNode || node instanceof SpaceNode || node instanceof HorizontalTabNode;
+	}
+
 	private void appendPrintCode(ParseNode node) {
 		String format = printFormat(node.getType());
 
 		code.append(visitor.removeValueCode(node));
 		convertToStringIfBoolean(node);
+		shiftAddressIfString(node);
 		code.add(PushD, format);
 		code.add(Printf);
 	}
@@ -61,6 +64,16 @@ public class PrintStatementGenerator {
 		code.add(Label, trueLabel);
 		code.add(PushD, RunTime.BOOLEAN_TRUE_STRING);
 		code.add(Label, endLabel);
+	}
+
+	private void shiftAddressIfString(ParseNode node) {
+		if(node.getType() != PrimitiveType.STRING) {
+			return;
+		}
+
+		int bytesToShift = 12;
+		code.add(PushI, bytesToShift);
+		code.add(Add);
 	}
 
 

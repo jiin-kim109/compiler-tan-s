@@ -1,0 +1,4 @@
+main {
+	const floa := 5;
+	print 3 <floa \n;
+}

@@ -1,0 +1,10 @@
+main {
+	const r := <int>('a');
+	print r \n;
+    const r2 := <char>(68);
+    print r2 \n;
+    var r3 := <bool>(68);
+    print r3 \n;
+    var r4 := <bool>('a');
+    print r4 \n;
+}

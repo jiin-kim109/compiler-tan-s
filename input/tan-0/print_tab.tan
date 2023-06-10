@@ -1,0 +1,5 @@
+main {
+	const a := 5;
+	print \ta \n;
+	print "test"\t a\n;
+}

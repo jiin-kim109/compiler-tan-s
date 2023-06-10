@@ -15,8 +15,9 @@ public class FloatingLiteralToken extends TokenImp {
 		return value;
 	}
 	
-	public static FloatingLiteralToken make(Locator locator, String lexeme) {
+	public static FloatingLiteralToken make(Locator locator, String lexeme) throws NumberFormatException {
 		FloatingLiteralToken result = new FloatingLiteralToken(locator, lexeme);
+		checkNumberOutOfBound(lexeme);
 		result.setValue(Double.parseDouble(lexeme));
 		return result;
 	}
@@ -24,5 +25,15 @@ public class FloatingLiteralToken extends TokenImp {
 	@Override
 	protected String rawString() {
 		return "floating number, " + value;
+	}
+
+	private static void checkNumberOutOfBound(String lexeme) throws NumberFormatException {
+		double parsed = Double.parseDouble(lexeme);
+		if (parsed == Double.POSITIVE_INFINITY) {
+			throw new NumberFormatException("number is too large " + lexeme);
+		}
+		else if (parsed == Double.NEGATIVE_INFINITY) {
+			throw new NumberFormatException("number is too small " + lexeme);
+		}
 	}
 }

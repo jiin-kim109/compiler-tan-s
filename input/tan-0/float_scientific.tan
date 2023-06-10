@@ -1,0 +1,6 @@
+main {
+    var r := 3.14e+4;
+    print r \n;
+    r := 3.14e-4;
+    print r \n;
+}

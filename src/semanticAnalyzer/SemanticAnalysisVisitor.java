@@ -32,10 +32,8 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 	public void visitLeave(ProgramNode node) {
 		leaveScope(node);
 	}
-	public void visitEnter(MainBlockNode node) {
-	}
-	public void visitLeave(MainBlockNode node) {
-	}
+	public void visitEnter(BlockNode node) { enterSubscope(node); }
+	public void visitLeave(BlockNode node) { leaveScope(node); }
 	
 	
 	///////////////////////////////////////////////////////////////////////////
@@ -49,7 +47,8 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		Scope baseScope = node.getLocalScope();
 		Scope scope = baseScope.createSubscope();
 		node.setScope(scope);
-	}		
+	}
+
 	private void leaveScope(ParseNode node) {
 		node.getScope().leave();
 	}
@@ -122,7 +121,7 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		}
 
 		FunctionSignature signature = FunctionSignatures.signature(node.getOperator(), childTypes);
-		
+
 		if(signature.accepts(childTypes)) {
 			node.setType(signature.resultType());
 			node.setSignature(signature);
@@ -157,11 +156,20 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 	@Override
 	public void visit(StringConstantNode node) { node.setType(PrimitiveType.STRING); }
 	@Override
+	public void visit(TypecastNode node) {
+		node.setType(node.castingType());
+	}
+	@Override
 	public void visit(NewlineNode node) {
 	}
 	@Override
 	public void visit(SpaceNode node) {
 	}
+
+	@Override
+	public void visit(HorizontalTabNode node) {
+	}
+
 	///////////////////////////////////////////////////////////////////////////
 	// IdentifierNodes, with helper methods
 	@Override

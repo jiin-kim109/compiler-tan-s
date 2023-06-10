@@ -1,0 +1,8 @@
+main {
+	const a := "hello";
+	print "yes" \n;
+	print a \n;
+	const b := "test";
+	print b \n;
+	print a \\ b \\ "end" \n;
+}

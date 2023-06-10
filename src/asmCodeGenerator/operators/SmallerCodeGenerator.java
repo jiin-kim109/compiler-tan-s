@@ -25,7 +25,7 @@ public class SmallerCodeGenerator extends ComparisonCodeGenerator {
         String joinLabel  = labeller.newLabel("join");
 
         Type operandType = operandType(node);
-        if (operandType == PrimitiveType.INTEGER) {
+        if (operandType == PrimitiveType.INTEGER || operandType == PrimitiveType.CHARACTER) {
             result.add(ASMOpcode.Subtract);
             result.add(ASMOpcode.JumpNeg, trueLabel);
             result.add(ASMOpcode.Jump, falseLabel);

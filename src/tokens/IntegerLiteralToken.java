@@ -15,7 +15,7 @@ public class IntegerLiteralToken extends TokenImp {
 		return value;
 	}
 	
-	public static IntegerLiteralToken make(Locator locator, String lexeme) {
+	public static IntegerLiteralToken make(Locator locator, String lexeme) throws NumberFormatException {
 		IntegerLiteralToken result = new IntegerLiteralToken(locator, lexeme);
 		result.setValue(Integer.parseInt(lexeme));
 		return result;

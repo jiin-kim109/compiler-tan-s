@@ -14,7 +14,6 @@ import lexicalAnalyzer.Punctuator;
 import parseTree.*;
 import parseTree.nodeTypes.*;
 import semanticAnalyzer.signatures.FunctionSignature;
-import semanticAnalyzer.signatures.FunctionSignatures;
 import semanticAnalyzer.types.PrimitiveType;
 import semanticAnalyzer.types.Type;
 import symbolTable.Binding;
@@ -169,7 +168,7 @@ public class ASMCodeGenerator {
 				code.append(childCode);
 			}
 		}
-		public void visitLeave(MainBlockNode node) {
+		public void visitLeave(BlockNode node) {
 			newVoidCode(node);
 			for(ParseNode child : node.getChildren()) {
 				ASMCodeFragment childCode = removeVoidCode(child);
@@ -194,7 +193,11 @@ public class ASMCodeGenerator {
 			code.add(PushD, RunTime.SPACE_PRINT_FORMAT);
 			code.add(Printf);
 		}
-		
+		public void visit(HorizontalTabNode node) {
+			newVoidCode(node);
+			code.add(PushD, RunTime.HORIZONTAL_TAB_PRINT_FORMAT);
+			code.add(Printf);
+		}
 
 		public void visitLeave(DeclarationNode node) {
 			newVoidCode(node);
@@ -264,17 +267,6 @@ public class ASMCodeGenerator {
 				ASMCodeFragment fragment = generator.generate(node, childValueCode(node));
 				codeMap.put(node, fragment);
 			}
-			/*
-			if(operator == Punctuator.SUBTRACT) {
-				visitUnaryOperatorNode(node);
-			}
-			else if(operator == Punctuator.GREATER) {
-				visitComparisonOperatorNode(node, operator);
-			}
-			else {
-				visitNormalBinaryOperatorNode(node);
-			}
-			 */
 		}
 
 		private List<ASMCodeFragment> childValueCode(OperatorNode node) {
@@ -378,7 +370,7 @@ public class ASMCodeGenerator {
 		}
 
 		public void visit(StringConstantNode node) {
-			newAddressCode(node);
+			newValueCode(node);
 			String address = node.getValue().replaceAll("\\s+","");
 
 			code.add(DLabel, address);
@@ -395,6 +387,12 @@ public class ASMCodeGenerator {
 			newValueCode(node);
 
 			code.add(PushF, node.getValue());
+		}
+
+		public void visit(TypecastNode node) {
+			newValueCode(node);
+
+			code.add(PushI, 0);
 		}
 	}
 

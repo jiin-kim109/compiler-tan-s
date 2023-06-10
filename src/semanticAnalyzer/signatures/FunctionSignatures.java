@@ -101,32 +101,52 @@ public class FunctionSignatures extends ArrayList<FunctionSignature> {
 
 		new FunctionSignatures(Punctuator.GREATER,
 				new FunctionSignature(new GreaterCodeGenerator(), INTEGER, INTEGER, BOOLEAN),
-				new FunctionSignature(new GreaterCodeGenerator(), FLOATING, FLOATING, BOOLEAN)
+				new FunctionSignature(new GreaterCodeGenerator(), FLOATING, FLOATING, BOOLEAN),
+				new FunctionSignature(new GreaterCodeGenerator(), CHARACTER, CHARACTER, BOOLEAN)
 		);
 
 		new FunctionSignatures(Punctuator.GREATER_OR_EQUAL,
 				new FunctionSignature(new GreaterEqualCodeGenerator(), INTEGER, INTEGER, BOOLEAN),
-				new FunctionSignature(new GreaterEqualCodeGenerator(), FLOATING, FLOATING, BOOLEAN)
+				new FunctionSignature(new GreaterEqualCodeGenerator(), FLOATING, FLOATING, BOOLEAN),
+				new FunctionSignature(new GreaterEqualCodeGenerator(), CHARACTER, CHARACTER, BOOLEAN)
 		);
 
 		new FunctionSignatures(Punctuator.SMALLER,
 				new FunctionSignature(new SmallerCodeGenerator(), INTEGER, INTEGER, BOOLEAN),
-				new FunctionSignature(new SmallerCodeGenerator(), FLOATING, FLOATING, BOOLEAN)
+				new FunctionSignature(new SmallerCodeGenerator(), FLOATING, FLOATING, BOOLEAN),
+				new FunctionSignature(new SmallerCodeGenerator(), CHARACTER, CHARACTER, BOOLEAN)
 		);
 
 		new FunctionSignatures(Punctuator.SMALLER_OR_EQUAL,
 				new FunctionSignature(new SmallerEqualCodeGenerator(), INTEGER, INTEGER, BOOLEAN),
-				new FunctionSignature(new SmallerEqualCodeGenerator(), FLOATING, FLOATING, BOOLEAN)
+				new FunctionSignature(new SmallerEqualCodeGenerator(), FLOATING, FLOATING, BOOLEAN),
+				new FunctionSignature(new SmallerEqualCodeGenerator(), CHARACTER, CHARACTER, BOOLEAN)
 		);
 
 		new FunctionSignatures(Punctuator.EQUAL,
 				new FunctionSignature(new EqualCodeGenerator(), INTEGER, INTEGER, BOOLEAN),
-				new FunctionSignature(new EqualCodeGenerator(), FLOATING, FLOATING, BOOLEAN)
+				new FunctionSignature(new EqualCodeGenerator(), FLOATING, FLOATING, BOOLEAN),
+				new FunctionSignature(new EqualCodeGenerator(), CHARACTER, CHARACTER, BOOLEAN),
+				new FunctionSignature(new EqualCodeGenerator(), BOOLEAN, BOOLEAN, BOOLEAN),
+				new FunctionSignature(new EqualCodeGenerator(), STRING, STRING, BOOLEAN)
 		);
 
 		new FunctionSignatures(Punctuator.NOT_EQUAL,
 				new FunctionSignature(new NotEqualCodeGenerator(), INTEGER, INTEGER, BOOLEAN),
-				new FunctionSignature(new NotEqualCodeGenerator(), FLOATING, FLOATING, BOOLEAN)
+				new FunctionSignature(new NotEqualCodeGenerator(), FLOATING, FLOATING, BOOLEAN),
+				new FunctionSignature(new NotEqualCodeGenerator(), CHARACTER, CHARACTER, BOOLEAN),
+				new FunctionSignature(new NotEqualCodeGenerator(), BOOLEAN, BOOLEAN, BOOLEAN),
+				new FunctionSignature(new NotEqualCodeGenerator(), STRING, STRING, BOOLEAN)
+		);
+
+		new FunctionSignatures(Punctuator.TYPE_CAST,
+				new FunctionSignature(new TypeCastCodeGenerator(), FLOATING, INTEGER, FLOATING),
+				new FunctionSignature(new TypeCastCodeGenerator(), INTEGER, FLOATING, INTEGER),
+				new FunctionSignature(new TypeCastCodeGenerator(), INTEGER, CHARACTER, INTEGER),
+				new FunctionSignature(new TypeCastCodeGenerator(), CHARACTER, INTEGER, CHARACTER),
+				new FunctionSignature(new TypeCastCodeGenerator(), BOOLEAN, INTEGER, BOOLEAN),
+				new FunctionSignature(new TypeCastCodeGenerator(), BOOLEAN, CHARACTER, BOOLEAN),
+				new FunctionSignature(new TypeCastCodeGenerator(), STRING, STRING, STRING)
 		);
 		
 		// First, we use the operator itself (in this case the Punctuator ADD) as the key.

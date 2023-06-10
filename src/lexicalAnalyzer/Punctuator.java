@@ -20,9 +20,13 @@ public enum Punctuator implements Lextant {
 	PRINT_SEPARATOR("\\"),
 	PRINT_SPACE("\\s"),
 	PRINT_NEWLINE("\\n"),
+	PRINT_HORIZONTAL_TAB("\\t"),
 	TERMINATOR(";"),
 	OPEN_BRACE("{"),
 	CLOSE_BRACE("}"),
+	OPEN_PARENTHESIS("("),
+	CLOSE_PARENTHESIS(")"),
+	TYPE_CAST(""),
 	NULL_PUNCTUATOR("");
 
 	private String lexeme;
@@ -38,8 +42,8 @@ public enum Punctuator implements Lextant {
 	public Token prototype() {
 		return prototype;
 	}
-	
-	
+
+
 	public static Punctuator forLexeme(String lexeme) {
 		for(Punctuator punctuator: values()) {
 			if(punctuator.lexeme.equals(lexeme)) {
@@ -47,6 +51,14 @@ public enum Punctuator implements Lextant {
 			}
 		}
 		return NULL_PUNCTUATOR;
+	}
+
+	public boolean equals(String lexeme) {
+		return this.lexeme.equals(lexeme);
+	}
+
+	public boolean equals(Character ch) {
+		return equals(ch.toString());
 	}
 	
 /*

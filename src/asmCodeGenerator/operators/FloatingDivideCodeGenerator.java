@@ -15,9 +15,10 @@ public class FloatingDivideCodeGenerator implements SimpleCodeGenerator {
         for (ASMCodeFragment arg : args) {
             result.append(arg);
         }
+
         result.add(ASMOpcode.Duplicate);
-        result.add(ASMOpcode.JumpFalse, RunTime.FLOATING_DIVIDE_BY_ZERO_RUNTIME_ERROR);
-        result.add(ASMOpcode.Divide);
+        result.add(ASMOpcode.JumpFZero, RunTime.FLOATING_DIVIDE_BY_ZERO_RUNTIME_ERROR);
+        result.add(ASMOpcode.FDivide);
         return result;
     }
 }

@@ -1,0 +1,8 @@
+main {
+    const a := "first string" ;
+    const b := "second string";
+    var c := a ;
+    print c \n;
+    c := b ;
+    print c \n;
+}

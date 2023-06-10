@@ -13,11 +13,25 @@
         DataC        37                        %% "%s"
         DataC        115                       
         DataC        0                         
+        DLabel       $print-format-character   
+        DataC        37                        %% "%c"
+        DataC        99                        
+        DataC        0                         
+        DLabel       $print-format-string      
+        DataC        37                        %% "%s"
+        DataC        115                       
+        DataC        0                         
         DLabel       $print-format-newline     
         DataC        10                        %% "\n"
         DataC        0                         
         DLabel       $print-format-space       
         DataC        32                        %% " "
+        DataC        0                         
+        DLabel       $print-format-tab         
+        DataC        32                        %% "    "
+        DataC        32                        
+        DataC        32                        
+        DataC        32                        
         DataC        0                         
         DLabel       $boolean-true-string      
         DataC        116                       %% "true"
@@ -82,6 +96,58 @@
         DataC        0                         
         Label        $$i-divide-by-zero        
         PushD        $errors-int-divide-by-zero 
+        Jump         $$general-runtime-error   
+        DLabel       $errors-float-divide-by-zero 
+        DataC        102                       %% "float divide by zero"
+        DataC        108                       
+        DataC        111                       
+        DataC        97                        
+        DataC        116                       
+        DataC        32                        
+        DataC        100                       
+        DataC        105                       
+        DataC        118                       
+        DataC        105                       
+        DataC        100                       
+        DataC        101                       
+        DataC        32                        
+        DataC        98                        
+        DataC        121                       
+        DataC        32                        
+        DataC        122                       
+        DataC        101                       
+        DataC        114                       
+        DataC        111                       
+        DataC        0                         
+        Label        $$f-divide-by-zero        
+        PushD        $errors-float-divide-by-zero 
+        Jump         $$general-runtime-error   
+        DLabel       $errors-bad-comparison-operand 
+        DataC        98                        %% "bad comparison operand"
+        DataC        97                        
+        DataC        100                       
+        DataC        32                        
+        DataC        99                        
+        DataC        111                       
+        DataC        109                       
+        DataC        112                       
+        DataC        97                        
+        DataC        114                       
+        DataC        105                       
+        DataC        115                       
+        DataC        111                       
+        DataC        110                       
+        DataC        32                        
+        DataC        111                       
+        DataC        112                       
+        DataC        101                       
+        DataC        114                       
+        DataC        97                        
+        DataC        110                       
+        DataC        100                       
+        DataC        0                         
+        Label        $$bad-comparison-operand  
+        PushD        $errors-bad-comparison-operand 
         Jump         $$general-runtime-error   
         DLabel       $usable-memory-start      
         DLabel       $global-memory-block      
@@ -187,7 +253,6 @@
         PushD        $global-memory-block      
         PushI        24                        
         Add                                    %% moredimes
-        Label        -Operator-10-args         
         PushD        $global-memory-block      
         PushI        4                         
         Add                                    %% dimes
@@ -196,7 +261,16 @@
         PushI        8                         
         Add                                    %% nickels
         LoadI                                  
-        Nop                                    
+        Subtract                               
+        JumpPos      -compare-10-true          
+        Jump         -compare-10-false         
+        Label        -compare-10-true          
+        PushI        1                         
+        Jump         -compare-10-join          
+        Label        -compare-10-false         
+        PushI        0                         
+        Jump         -compare-10-join          
+        Label        -compare-10-join          
         StoreC                                 
         PushD        $global-memory-block      
         PushI        24                        

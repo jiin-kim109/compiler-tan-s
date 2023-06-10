@@ -7,7 +7,11 @@ import logging.TanLogger;
 import inputHandler.InputHandler;
 import inputHandler.LocatedChar;
 import inputHandler.PushbackCharStream;
+import semanticAnalyzer.types.PrimitiveType;
 import tokens.*;
+
+import java.util.*;
+import java.util.stream.Stream;
 
 import static lexicalAnalyzer.PunctuatorScanningAids.*;
 
@@ -40,21 +44,21 @@ public class LexicalAnalyzer extends ScannerImp implements Scanner {
 		if(ch.isDigit()) {
 			return scanNumber(ch);
 		}
-		if(isCharacterSymbol(ch)) {
+		else if(isCharacterSymbol(ch)) {
 			return scanCharacter(ch);
 		}
 		else if(isStringSymbol(ch)) {
 			return scanString(ch);
 		}
-		else if(ch.isLowerCase()) {
+		else if(isIdentifierStart(ch)) {
 			return scanIdentifier(ch);
-		}
-		else if(isPunctuatorStart(ch)) {
-			return PunctuatorScanner.scan(ch, input);
 		}
 		else if(isCommentSymbol(ch)) {
 			skipToEndOfComment();
 			return findNextToken();
+		}
+		else if(isPunctuatorStart(ch)) {
+			return scanPunctuator(ch);
 		}
 		else if(isEndOfInput(ch)) {
 			return NullToken.make(ch);
@@ -92,24 +96,51 @@ public class LexicalAnalyzer extends ScannerImp implements Scanner {
 		buffer.append(firstChar.getCharacter());
 		appendSubsequentDigits(buffer);
 
-		if (input.peek().getCharacter() == DECIMAL_POINT) {
-			LocatedChar decimal = input.next();
-			buffer.append(decimal.getCharacter());
-			if (!input.peek().isDigit()) {
+		try {
+			if (input.peek().getCharacter() == DECIMAL_POINT) {
+				return scanFloatingNumber(firstChar, buffer);
+			} else {
+				return IntegerLiteralToken.make(firstChar, buffer.toString());
+			}
+		}
+		catch (NumberFormatException e) {
+			lexicalError("Numeric literal parsing exception", input.peek(), e.toString());
+			return findNextToken();
+		}
+	}
+
+	private Token scanFloatingNumber(LocatedChar firstChar, StringBuffer buffer) {
+		LocatedChar decimal = input.next();
+		if (decimal.getCharacter() != DECIMAL_POINT || !input.peek().isDigit()) {
+			lexicalError("Malformed floating-point literal", input.peek());
+			return findNextToken();
+		}
+
+		buffer.append(DECIMAL_POINT);
+		buffer.append(input.next().getCharacter());
+		appendSubsequentDigits(buffer);
+
+		LocatedChar next = input.next();
+		if (next.getCharacter() == 'e' || next.getCharacter() == 'E') {
+			buffer.append(next.getCharacter());
+			LocatedChar sign = input.next();
+			if (sign.getCharacter() == '+' || sign.getCharacter() == '-') {
+				buffer.append(sign.getCharacter());
+			}
+			else if (sign.isDigit()) {
+				buffer.append('+');
+				buffer.append(sign.getCharacter());
+			}
+			else {
 				lexicalError("Malformed floating-point literal", decimal);
 				return findNextToken();
 			}
 			appendSubsequentDigits(buffer);
-			LocatedChar next = input.next();
-			if (next.getCharacter() == 'e' || next.getCharacter() == 'E') {
-				//TODO
-			}
-			input.pushback(next);
-			return FloatingLiteralToken.make(firstChar, buffer.toString());
 		}
 		else {
-			return IntegerLiteralToken.make(firstChar, buffer.toString());
+			input.pushback(next);
 		}
+		return FloatingLiteralToken.make(firstChar, buffer.toString());
 	}
 
 	private Token scanCharacter(LocatedChar firstChar) {
@@ -161,6 +192,39 @@ public class LexicalAnalyzer extends ScannerImp implements Scanner {
 		}
 		input.pushback(c);
 	}
+
+	private Token scanPunctuator(LocatedChar firstChar) {
+		if (isTypeCastStart(firstChar)) {
+			Stack<LocatedChar> backupPrefix = new Stack<>();
+
+			StringBuffer buffer = new StringBuffer();
+			LocatedChar next = nextNonWhitespaceChar();
+
+			buffer.append(firstChar.getCharacter());
+			buffer.append(next.getCharacter());
+			backupPrefix.push(next);
+			while (next.isLowerCase()) {
+				next = nextNonWhitespaceChar();
+				backupPrefix.push(next);
+				buffer.append(next.getCharacter());
+			}
+
+			PrimitiveType type = PrimitiveType.forLexeme(buffer.substring(1, buffer.length()-1));
+			if (type != PrimitiveType.NO_TYPE && Punctuator.GREATER.equals(next.getCharacter())) {
+				return LextantToken.make(firstChar, buffer.toString(), Punctuator.TYPE_CAST);
+			}
+			else {
+				while (!backupPrefix.isEmpty()) {
+					input.pushback(backupPrefix.pop());
+				}
+			}
+		}
+		return PunctuatorScanner.scan(firstChar, input);
+	}
+
+	private boolean isTypeCastStart(LocatedChar lc) {
+		return Punctuator.SMALLER.equals(lc.getCharacter());
+	}
 	
 	
 	//////////////////////////////////////////////////////////////////////////////
@@ -169,7 +233,7 @@ public class LexicalAnalyzer extends ScannerImp implements Scanner {
 	private Token scanIdentifier(LocatedChar firstChar) {
 		StringBuffer buffer = new StringBuffer();
 		buffer.append(firstChar.getCharacter());
-		appendSubsequentLowercase(buffer);
+		appendSubsequentIdentifierCharacters(buffer);
 
 		String lexeme = buffer.toString();
 		if(Keyword.isAKeyword(lexeme)) {
@@ -179,9 +243,14 @@ public class LexicalAnalyzer extends ScannerImp implements Scanner {
 			return IdentifierToken.make(firstChar, lexeme);
 		}
 	}
-	private void appendSubsequentLowercase(StringBuffer buffer) {
+
+	private void appendSubsequentIdentifierCharacters(StringBuffer buffer) {
 		LocatedChar c = input.next();
-		while(c.isLowerCase()) {
+		while(c.isLowerCase() ||
+				c.isUpperCase() ||
+				c.isDigit() ||
+				c.getCharacter() == '_' ||
+				c.getCharacter() == '@') {
 			buffer.append(c.getCharacter());
 			c = input.next();
 		}
@@ -227,6 +296,10 @@ public class LexicalAnalyzer extends ScannerImp implements Scanner {
 	//////////////////////////////////////////////////////////////////////////////
 	// Character-classification routines specific to tan scanning.	
 
+	private boolean isIdentifierStart(LocatedChar lc) {
+		return lc.isLowerCase() || lc.isUpperCase() || lc.getCharacter() == '_' || lc.getCharacter() == '@';
+	}
+
 	private boolean isCharacterSymbol(LocatedChar lc) {
 		return lc.getCharacter() == QUOTATION || lc.getCharacter() == ASCII_OCTAL_SYMBOL;
 	}
@@ -260,5 +333,10 @@ public class LexicalAnalyzer extends ScannerImp implements Scanner {
 	private void lexicalError(String errorMsg, LocatedChar decimal) {
 		TanLogger log = TanLogger.getLogger("compiler.lexicalAnalyzer");
 		log.severe("Lexical error: " + errorMsg + " at " + decimal.getLocation());
+	}
+
+	private void lexicalError(String errorMsg, LocatedChar ch, String lexeme) {
+		TanLogger log = TanLogger.getLogger("compiler.lexicalAnalyzer");
+		log.severe("Lexical error: " + errorMsg + " at " + ch.getLocation() + ", while reading " + lexeme);
 	}
 }
