@@ -2,6 +2,7 @@ package semanticAnalyzer.types;
 
 
 import java.util.List;
+import java.util.Set;
 
 public enum PrimitiveType implements Type {
 	BOOLEAN(1),
@@ -28,5 +29,20 @@ public enum PrimitiveType implements Type {
 	}
 	public String infoString() {
 		return infoString;
+	}
+
+	@Override
+	public boolean equivalent(Type otherType) {
+		return this==otherType;
+	}
+
+	@Override
+	public void addTypeVariables(Set<TypeVariable> typeVariables) {
+		return;
+	}
+
+	@Override
+	public Type concreteType() {
+		return this;
 	}
 }

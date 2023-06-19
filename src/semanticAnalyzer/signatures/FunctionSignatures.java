@@ -8,8 +8,11 @@ import java.util.Map;
 import asmCodeGenerator.codeStorage.ASMOpcode;
 import asmCodeGenerator.operators.*;
 import lexicalAnalyzer.Punctuator;
+import semanticAnalyzer.types.Array;
 import semanticAnalyzer.types.PrimitiveType;
 import semanticAnalyzer.types.Type;
+import semanticAnalyzer.types.TypeVariable;
+
 import static semanticAnalyzer.types.PrimitiveType.*;
 
 
@@ -147,6 +150,13 @@ public class FunctionSignatures extends ArrayList<FunctionSignature> {
 				new FunctionSignature(new TypeCastCodeGenerator(), BOOLEAN, INTEGER, BOOLEAN),
 				new FunctionSignature(new TypeCastCodeGenerator(), BOOLEAN, CHARACTER, BOOLEAN),
 				new FunctionSignature(new TypeCastCodeGenerator(), STRING, STRING, STRING)
+		);
+
+		// use semantic analysis to set what T is
+		// define Array and Indexing
+		TypeVariable T = new TypeVariable("T");
+		new FunctionSignatures(Punctuator.INDEXING,
+				new FunctionSignature(new Array("T"), INTEGER, T)
 		);
 		
 		// First, we use the operator itself (in this case the Punctuator ADD) as the key.

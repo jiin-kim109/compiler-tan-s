@@ -1,11 +1,15 @@
 package semanticAnalyzer.signatures;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import semanticAnalyzer.types.PrimitiveType;
 import semanticAnalyzer.types.Type;
 import lexicalAnalyzer.Lextant;
 import lexicalAnalyzer.Punctuator;
+import semanticAnalyzer.types.TypeVariable;
 
 //immutable
 public class FunctionSignature {
@@ -13,6 +17,7 @@ public class FunctionSignature {
 	private Type resultType;
 	private Type[] paramTypes;
 	Object whichVariant;
+	private Set<TypeVariable> typeVariables;
 	
 	
 	///////////////////////////////////////////////////////////////
@@ -23,6 +28,14 @@ public class FunctionSignature {
 		storeParamTypes(types);
 		resultType = types[types.length-1];
 		this.whichVariant = whichVariant;
+		findTypeVariables();
+	}
+	private void findTypeVariables() {
+		typeVariables = new HashSet<TypeVariable>();
+		for (Type type : paramTypes) {
+			type.addTypeVariables(typeVariables);
+		}
+		resultType.addTypeVariables(resultType);
 	}
 	private void storeParamTypes(Type[] types) {
 		paramTypes = new Type[types.length-1];
@@ -50,22 +63,30 @@ public class FunctionSignature {
 	// main query
 
 	public boolean accepts(List<Type> types) {
-		if(types.size() != paramTypes.length) {
+		if (type.size() != paramTytpes.length) {
 			return false;
 		}
-		
-		for(int i=0; i<paramTypes.length; i++) {
-			if(!assignableTo(paramTypes[i], types.get(i))) {
+		resetTypeVariables();
+
+		for (int i=0; i<paramTypes.length; i++) {
+			if (!assignableTo(paramTypes[i], types.get(i))) {
 				return false;
 			}
-		}		
+		}
 		return true;
 	}
-	private boolean assignableTo(Type variableType, Type valueType) {
-		if(valueType == PrimitiveType.ERROR && ALL_TYPES_ACCEPT_ERROR_TYPES) {
+
+	private void resetTypeVariables() {
+		for (TypeVariable variable : typeVariables) {
+			variable.reset();
+		}
+	}
+
+	private boolean assignableTo(Type formalType, Type actualType) {
+		if(actualType == PrimitiveType.ERROR && ALL_TYPES_ACCEPT_ERROR_TYPES) {
 			return true;
-		}	
-		return variableType.equals(valueType);
+		}
+		return formalType.equals(actualType);
 	}
 	
 	// Null object pattern
