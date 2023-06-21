@@ -156,7 +156,7 @@ public class FunctionSignatures extends ArrayList<FunctionSignature> {
 		// define Array and Indexing
 		TypeVariable T = new TypeVariable("T");
 		new FunctionSignatures(Punctuator.INDEXING,
-				new FunctionSignature(new Array("T"), INTEGER, T)
+				new FunctionSignature(new Array(T), INTEGER, T)
 		);
 		
 		// First, we use the operator itself (in this case the Punctuator ADD) as the key.

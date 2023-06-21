@@ -1,15 +1,18 @@
 package semanticAnalyzer;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import lexicalAnalyzer.Keyword;
+import lexicalAnalyzer.Lextant;
 import logging.TanLogger;
 import parseTree.ParseNode;
 import parseTree.ParseNodeVisitor;
 import parseTree.nodeTypes.*;
 import semanticAnalyzer.signatures.FunctionSignature;
 import semanticAnalyzer.signatures.FunctionSignatures;
+import semanticAnalyzer.signatures.PromotedSignature;
 import semanticAnalyzer.types.PrimitiveType;
 import semanticAnalyzer.types.Type;
 import symbolTable.Binding;
@@ -120,7 +123,19 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 			childTypes = Arrays.asList(left.getType(), right.getType());		
 		}
 
-		FunctionSignature signature = FunctionSignatures.signature(node.getOperator(), childTypes);
+		Lextant operator = node.getOperator();
+		FunctionSignatures signatures = FunctionSignatures.signaturesOf(operator);
+		List<PromotedSignature> promotedSignatures = PromotedSignature.promotedSignatures(signatures, childTypes);
+		List<List<PromotedSignature>> byNumPromotions = new ArrayList<>();
+		final int MAX_NUM_PROMOTION = 2;
+		for (int i=0; i<MAX_NUM_PROMOTION; i++) {
+			byNumPromotions.add(new ArrayList<PromotedSignature>());
+		}
+		for (PromotedSignature promotedSignature : promotedSignatures) {
+			byNumPromotions.get(promotedSignature.numPromotions()).add(promotedSignature);
+		}
+
+		PromotedSignature signature = selectPromotedSignature(byNumPromotions);
 
 		if(signature.accepts(childTypes)) {
 			node.setType(signature.resultType().concreteType());
@@ -132,6 +147,19 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		}
 	}
 
+	private PromotedSignature selectPromotedSignature(List<List<PromotedSignature>> byNumPromotions) {
+		for (int i=0; i<MAX_NUM_PROMOTION; i++) {
+			switch (byNumPromotions.get(i).size()) {
+				case 0: break;
+				case 1: return byNumPromotions.get(i).get(0);
+				default:
+				case 2: multipleInterpretationsError();
+						return PromotedSignature.nullInstance();
+			}
+		}
+		typeCheckError();
+		return PromotedSignature.nullInstance();
+	}
 
 	///////////////////////////////////////////////////////////////////////////
 	// simple leaf nodes
@@ -194,6 +222,10 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 	
 	///////////////////////////////////////////////////////////////////////////
 	// error logging/printing
+
+	private void multipleInterpretationsError() {
+		logError("Multiple interpretations of operator possible");
+	}
 
 	private void typeCheckError(ParseNode node, List<Type> operandTypes) {
 		Token token = node.getToken();

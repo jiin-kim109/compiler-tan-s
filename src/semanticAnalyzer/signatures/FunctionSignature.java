@@ -128,4 +128,19 @@ public class FunctionSignature {
 		}
 	}
 
+	public List<Type> typeVariableSettings() {
+		List<Type> results = new ArrayList<Type>();
+		for (TypeVariable typeVariable : typeVariables) {
+			results.add(typeVariable.concreteType());
+		}
+		return results;
+	}
+
+	public void setTypeVariables(List<Type> typeVariableSettings) {
+		int i = 0;
+		for (TypeVariable typeVariable : typeVariables) {
+			typeVariable.setContraint(typeVariableSettings.get(i));
+			i += 1;
+		}
+	}
 }
