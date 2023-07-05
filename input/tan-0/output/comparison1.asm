@@ -28,10 +28,7 @@
         DataC        32                        %% " "
         DataC        0                         
         DLabel       $print-format-tab         
-        DataC        32                        %% "    "
-        DataC        32                        
-        DataC        32                        
-        DataC        32                        
+        DataC        9                         %% "\t"
         DataC        0                         
         DLabel       $boolean-true-string      
         DataC        116                       %% "true"
@@ -154,7 +151,9 @@
         DataZ        0                         
         Label        $$main                    
         PushI        3                         
+        Nop                                    
         PushI        2                         
+        Nop                                    
         Subtract                               
         JumpPos      -compare-1-true           
         Jump         -compare-1-false          
@@ -176,7 +175,9 @@
         PushD        $print-format-newline     
         Printf                                 
         PushF        3.100000                  
+        Nop                                    
         PushF        2.100000                  
+        Nop                                    
         FSubtract                              
         JumpFPos     -compare-3-true           
         Jump         -compare-3-false          
@@ -198,7 +199,9 @@
         PushD        $print-format-newline     
         Printf                                 
         PushI        2                         
+        Nop                                    
         PushI        3                         
+        Nop                                    
         Subtract                               
         JumpPos      -compare-5-true           
         Jump         -compare-5-false          
@@ -220,7 +223,9 @@
         PushD        $print-format-newline     
         Printf                                 
         PushI        3                         
+        Nop                                    
         PushI        2                         
+        Nop                                    
         Subtract                               
         JumpNeg      -compare-7-false          
         Jump         -compare-7-true           
@@ -242,7 +247,9 @@
         PushD        $print-format-newline     
         Printf                                 
         PushF        3.100000                  
+        Nop                                    
         PushF        2.100000                  
+        Nop                                    
         FSubtract                              
         JumpFNeg     -compare-9-false          
         Jump         -compare-9-true           
@@ -264,7 +271,9 @@
         PushD        $print-format-newline     
         Printf                                 
         PushI        2                         
+        Nop                                    
         PushI        3                         
+        Nop                                    
         Subtract                               
         JumpNeg      -compare-11-false         
         Jump         -compare-11-true          
@@ -286,7 +295,9 @@
         PushD        $print-format-newline     
         Printf                                 
         PushI        2                         
+        Nop                                    
         PushI        2                         
+        Nop                                    
         Subtract                               
         JumpNeg      -compare-13-false         
         Jump         -compare-13-true          
@@ -308,7 +319,9 @@
         PushD        $print-format-newline     
         Printf                                 
         PushI        97                        
+        Nop                                    
         PushI        99                        
+        Nop                                    
         Subtract                               
         JumpPos      -compare-15-true          
         Jump         -compare-15-false         
@@ -330,7 +343,9 @@
         PushD        $print-format-newline     
         Printf                                 
         PushI        90                        
+        Nop                                    
         PushI        65                        
+        Nop                                    
         Subtract                               
         JumpNeg      -compare-17-false         
         Jump         -compare-17-true          

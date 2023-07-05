@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import lexicalAnalyzer.Keyword;
-import lexicalAnalyzer.Lextant;
+import lexicalAnalyzer.Punctuator;
 import logging.TanLogger;
 import parseTree.ParseNode;
 import parseTree.ParseNodeVisitor;
@@ -120,22 +120,10 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 			ParseNode left  = node.child(0);
 			ParseNode right = node.child(1);
 			
-			childTypes = Arrays.asList(left.getType(), right.getType());		
+			childTypes = Arrays.asList(left.getType(), right.getType());
 		}
 
-		Lextant operator = node.getOperator();
-		FunctionSignatures signatures = FunctionSignatures.signaturesOf(operator);
-		List<PromotedSignature> promotedSignatures = PromotedSignature.promotedSignatures(signatures, childTypes);
-		List<List<PromotedSignature>> byNumPromotions = new ArrayList<>();
-		final int MAX_NUM_PROMOTION = 2;
-		for (int i=0; i<MAX_NUM_PROMOTION; i++) {
-			byNumPromotions.add(new ArrayList<PromotedSignature>());
-		}
-		for (PromotedSignature promotedSignature : promotedSignatures) {
-			byNumPromotions.get(promotedSignature.numPromotions()).add(promotedSignature);
-		}
-
-		PromotedSignature signature = selectPromotedSignature(byNumPromotions);
+		PromotedSignature signature = selectPromotedSignature(node, childTypes);
 
 		if(signature.accepts(childTypes)) {
 			node.setType(signature.resultType().concreteType());
@@ -147,7 +135,15 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		}
 	}
 
-	private PromotedSignature selectPromotedSignature(List<List<PromotedSignature>> byNumPromotions) {
+	private PromotedSignature selectPromotedSignature(OperatorNode node, List<Type> childTypes) {
+		final int MAX_NUM_PROMOTION = 2;
+		FunctionSignatures signatures = FunctionSignatures.signaturesOf(node.getOperator());
+		List<PromotedSignature> promotedSignatures = PromotedSignature.promotedSignatures(signatures, childTypes);
+		List<List<PromotedSignature>> byNumPromotions = Arrays.asList(new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
+		for (PromotedSignature promotedSignature : promotedSignatures) {
+			byNumPromotions.get(promotedSignature.numPromotions()).add(promotedSignature);
+		}
+
 		for (int i=0; i<MAX_NUM_PROMOTION; i++) {
 			switch (byNumPromotions.get(i).size()) {
 				case 0: break;
@@ -157,7 +153,7 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 						return PromotedSignature.nullInstance();
 			}
 		}
-		typeCheckError();
+		typeCheckError(node, childTypes);
 		return PromotedSignature.nullInstance();
 	}
 
@@ -184,7 +180,7 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 	@Override
 	public void visit(StringConstantNode node) { node.setType(PrimitiveType.STRING); }
 	@Override
-	public void visit(TypecastNode node) {
+	public void visit(TypeNode node) {
 		node.setType(node.primitiveType());
 	}
 	@Override

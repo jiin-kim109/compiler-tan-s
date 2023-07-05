@@ -20,6 +20,20 @@ public class TypeVariable implements Type {
 		reset();
 	}
 
+	public void reset() {
+		this.constraint = PrimitiveType.NO_TYPE;
+	}
+
+	@Override
+	public int getSize() {
+		return constraint.getSize();
+	}
+
+	@Override
+	public String infoString() {
+		return null;
+	}
+
 	@Override
 	public boolean equivalent(Type otherType) {
 		if (constraint == PrimitiveType.NO_TYPE) {
@@ -29,10 +43,6 @@ public class TypeVariable implements Type {
 		return constraint.equivalent(otherType);
 	}
 
-	@Override
-	getSize() {
-
-	}
 	@Override
 	public void addTypeVariables(Set<TypeVariable> typeVariables) {
 		typeVariables.add(this);

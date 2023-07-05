@@ -7,12 +7,18 @@ import tokens.StringLiteralToken;
 import tokens.Token;
 
 public class StringConstantNode extends ParseNode {
+
+	private static int addressCounter = 0;
 	public StringConstantNode(Token token) {
 		super(token);
 		assert(token instanceof StringLiteralToken);
 	}
 	public StringConstantNode(ParseNode node) {
 		super(node);
+	}
+
+	public static int addressCounter() {
+		return addressCounter++;
 	}
 
 ////////////////////////////////////////////////////////////

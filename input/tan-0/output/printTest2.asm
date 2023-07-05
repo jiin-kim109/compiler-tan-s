@@ -28,10 +28,7 @@
         DataC        32                        %% " "
         DataC        0                         
         DLabel       $print-format-tab         
-        DataC        32                        %% "    "
-        DataC        32                        
-        DataC        32                        
-        DataC        32                        
+        DataC        9                         %% "\t"
         DataC        0                         
         DLabel       $boolean-true-string      
         DataC        116                       %% "true"

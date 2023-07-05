@@ -6,6 +6,10 @@ public class Array implements Type{
 
     private Type subtype;
 
+    public Array(TypeVariable type) {
+
+    }
+
     @Override
     public int getSize() {
         return 0;

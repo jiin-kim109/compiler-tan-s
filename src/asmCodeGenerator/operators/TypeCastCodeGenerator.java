@@ -4,7 +4,7 @@ import asmCodeGenerator.Labeller;
 import asmCodeGenerator.codeStorage.ASMCodeFragment;
 import asmCodeGenerator.codeStorage.ASMOpcode;
 import parseTree.ParseNode;
-import parseTree.nodeTypes.TypecastNode;
+import parseTree.nodeTypes.TypeNode;
 import semanticAnalyzer.types.PrimitiveType;
 
 import java.util.List;
@@ -14,8 +14,8 @@ import static asmCodeGenerator.codeStorage.ASMOpcode.*;
 public class TypeCastCodeGenerator extends ComparisonCodeGenerator {
     @Override
     public ASMCodeFragment generate(ParseNode node, List<ASMCodeFragment> args) {
-        assert(node.child(0) instanceof TypecastNode);
-        assert(((TypecastNode) node.child(0)).primitiveType() != PrimitiveType.NO_TYPE);
+        assert(node.child(0) instanceof TypeNode);
+        assert(((TypeNode) node.child(0)).primitiveType() != PrimitiveType.NO_TYPE);
 
         ASMCodeFragment result = new ASMCodeFragment(ASMCodeFragment.CodeType.GENERATES_VALUE);
         for (ASMCodeFragment arg : args) {
@@ -25,7 +25,7 @@ public class TypeCastCodeGenerator extends ComparisonCodeGenerator {
         result.add(Exchange);
         result.add(Pop);
 
-        if (node.getType() == PrimitiveType.FLOATING) {
+        if (node.getType() == PrimitiveType.FLOATING && node.child(1).getType() != PrimitiveType.FLOATING) {
             result.add(ConvertF);
         }
         else if (node.getType() == PrimitiveType.INTEGER) {

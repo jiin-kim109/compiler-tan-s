@@ -28,10 +28,7 @@
         DataC        32                        %% " "
         DataC        0                         
         DLabel       $print-format-tab         
-        DataC        32                        %% "    "
-        DataC        32                        
-        DataC        32                        
-        DataC        32                        
+        DataC        9                         %% "\t"
         DataC        0                         
         DLabel       $boolean-true-string      
         DataC        116                       %% "true"
@@ -172,10 +169,12 @@
         PushI        0                         
         Add                                    %% a
         LoadC                                  
+        Nop                                    
         PushD        $global-memory-block      
         PushI        1                         
         Add                                    %% b
         LoadC                                  
+        Nop                                    
         Subtract                               
         JumpFalse    -compare-1-true           
         Jump         -compare-1-false          
@@ -200,10 +199,12 @@
         PushI        0                         
         Add                                    %% a
         LoadC                                  
+        Nop                                    
         PushD        $global-memory-block      
         PushI        1                         
         Add                                    %% b
         LoadC                                  
+        Nop                                    
         Subtract                               
         JumpFalse    -compare-3-false          
         Jump         -compare-3-true           
@@ -228,10 +229,12 @@
         PushI        0                         
         Add                                    %% a
         LoadC                                  
+        Nop                                    
         PushD        $global-memory-block      
         PushI        2                         
         Add                                    %% c
         LoadC                                  
+        Nop                                    
         Subtract                               
         JumpFalse    -compare-5-true           
         Jump         -compare-5-false          
@@ -256,10 +259,12 @@
         PushI        0                         
         Add                                    %% a
         LoadC                                  
+        Nop                                    
         PushD        $global-memory-block      
         PushI        2                         
         Add                                    %% c
         LoadC                                  
+        Nop                                    
         Subtract                               
         JumpFalse    -compare-7-false          
         Jump         -compare-7-true           

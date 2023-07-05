@@ -46,4 +46,11 @@ public class PushbackCharStream extends LocatedCharStream {
 		return new PushbackCharStream(handler);
 	}
 
+	public LocatedChar nextNonWhitespaceChar() {
+		LocatedChar ch = next();
+		while(ch.isWhitespace()) {
+			ch = next();
+		}
+		return ch;
+	}
 }

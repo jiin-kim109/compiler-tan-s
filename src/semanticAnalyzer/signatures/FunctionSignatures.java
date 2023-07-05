@@ -12,6 +12,7 @@ import semanticAnalyzer.types.Array;
 import semanticAnalyzer.types.PrimitiveType;
 import semanticAnalyzer.types.Type;
 import semanticAnalyzer.types.TypeVariable;
+import symbolTable.Binding;
 
 import static semanticAnalyzer.types.PrimitiveType.*;
 
@@ -19,11 +20,18 @@ import static semanticAnalyzer.types.PrimitiveType.*;
 public class FunctionSignatures extends ArrayList<FunctionSignature> {
 	private static final long serialVersionUID = -4907792488209670697L;
 	private static Map<Object, FunctionSignatures> signaturesForKey = new HashMap<Object, FunctionSignatures>();
+
+	public enum Promotable {
+		PROMOTABLE,
+		NOT_PROMOTABLE
+	}
+	private Promotable promotable;
 	
 	Object key;
 	
-	public FunctionSignatures(Object key, FunctionSignature ...functionSignatures) {
+	public FunctionSignatures(Object key, Promotable promotable, FunctionSignature ...functionSignatures) {
 		this.key = key;
+		this.promotable = promotable;
 		for(FunctionSignature functionSignature: functionSignatures) {
 			add(functionSignature);
 		}
@@ -53,7 +61,7 @@ public class FunctionSignatures extends ArrayList<FunctionSignature> {
 	/////////////////////////////////////////////////////////////////////////////////
 	// access to FunctionSignatures by key object.
 	
-	public static FunctionSignatures nullSignatures = new FunctionSignatures(0, FunctionSignature.nullInstance());
+	public static FunctionSignatures nullSignatures = new FunctionSignatures(0, Promotable.NOT_PROMOTABLE, FunctionSignature.nullInstance());
 
 	public static FunctionSignatures signaturesOf(Object key) {
 		if(signaturesForKey.containsKey(key)) {
@@ -74,67 +82,66 @@ public class FunctionSignatures extends ArrayList<FunctionSignature> {
 		// here's one example to get you started with FunctionSignatures: the signatures for addition.		
 		// for this to work, you should statically import PrimitiveType.*
 
-		new FunctionSignatures(Punctuator.ADD,
+		new FunctionSignatures(Punctuator.ADD, Promotable.PROMOTABLE,
 			new FunctionSignature(ASMOpcode.Nop, INTEGER, INTEGER),
 			new FunctionSignature(ASMOpcode.Nop, FLOATING, FLOATING),
 		    new FunctionSignature(ASMOpcode.Add, INTEGER, INTEGER, INTEGER),
 		    new FunctionSignature(ASMOpcode.FAdd, FLOATING, FLOATING, FLOATING)
 		);
 
-		new FunctionSignatures(Punctuator.SUBTRACT,
+		new FunctionSignatures(Punctuator.SUBTRACT, Promotable.PROMOTABLE,
 				new FunctionSignature(ASMOpcode.Negate, INTEGER, INTEGER),
-				new FunctionSignature(ASMOpcode.Negate, FLOATING, FLOATING),
+				new FunctionSignature(ASMOpcode.FNegate, FLOATING, FLOATING),
 				new FunctionSignature(ASMOpcode.Subtract, INTEGER, INTEGER, INTEGER),
 				new FunctionSignature(ASMOpcode.FSubtract, FLOATING, FLOATING, FLOATING)
 		);
 
-		new FunctionSignatures(Punctuator.MULTIPLY,
+		new FunctionSignatures(Punctuator.MULTIPLY, Promotable.PROMOTABLE,
 				new FunctionSignature(ASMOpcode.Multiply, INTEGER, INTEGER, INTEGER),
-				new FunctionSignature(ASMOpcode.Multiply, INTEGER, FLOATING, FLOATING),
-				new FunctionSignature(ASMOpcode.Multiply, FLOATING, INTEGER, FLOATING),
-				new FunctionSignature(ASMOpcode.Multiply, FLOATING, FLOATING, FLOATING)
+				new FunctionSignature(ASMOpcode.FMultiply, FLOATING, FLOATING, FLOATING)
 		);
 
-		new FunctionSignatures(Punctuator.DIVIDE,
+		new FunctionSignatures(Punctuator.DIVIDE, Promotable.PROMOTABLE,
 				new FunctionSignature(new IntegerDivideCodeGenerator(), INTEGER, INTEGER, INTEGER),
 				new FunctionSignature(new FloatingDivideCodeGenerator(), INTEGER, FLOATING, FLOATING),
 				new FunctionSignature(new FloatingDivideCodeGenerator(), FLOATING, INTEGER, FLOATING),
 				new FunctionSignature(new FloatingDivideCodeGenerator(), FLOATING, FLOATING, FLOATING)
 		);
 
-		new FunctionSignatures(Punctuator.GREATER,
+		new FunctionSignatures(Punctuator.GREATER, Promotable.NOT_PROMOTABLE,
 				new FunctionSignature(new GreaterCodeGenerator(), INTEGER, INTEGER, BOOLEAN),
 				new FunctionSignature(new GreaterCodeGenerator(), FLOATING, FLOATING, BOOLEAN),
 				new FunctionSignature(new GreaterCodeGenerator(), CHARACTER, CHARACTER, BOOLEAN)
 		);
 
-		new FunctionSignatures(Punctuator.GREATER_OR_EQUAL,
+		new FunctionSignatures(Punctuator.GREATER_OR_EQUAL, Promotable.NOT_PROMOTABLE,
 				new FunctionSignature(new GreaterEqualCodeGenerator(), INTEGER, INTEGER, BOOLEAN),
 				new FunctionSignature(new GreaterEqualCodeGenerator(), FLOATING, FLOATING, BOOLEAN),
 				new FunctionSignature(new GreaterEqualCodeGenerator(), CHARACTER, CHARACTER, BOOLEAN)
 		);
 
-		new FunctionSignatures(Punctuator.SMALLER,
+		new FunctionSignatures(Punctuator.SMALLER, Promotable.NOT_PROMOTABLE,
 				new FunctionSignature(new SmallerCodeGenerator(), INTEGER, INTEGER, BOOLEAN),
 				new FunctionSignature(new SmallerCodeGenerator(), FLOATING, FLOATING, BOOLEAN),
 				new FunctionSignature(new SmallerCodeGenerator(), CHARACTER, CHARACTER, BOOLEAN)
 		);
 
-		new FunctionSignatures(Punctuator.SMALLER_OR_EQUAL,
+		new FunctionSignatures(Punctuator.SMALLER_OR_EQUAL, Promotable.NOT_PROMOTABLE,
 				new FunctionSignature(new SmallerEqualCodeGenerator(), INTEGER, INTEGER, BOOLEAN),
 				new FunctionSignature(new SmallerEqualCodeGenerator(), FLOATING, FLOATING, BOOLEAN),
 				new FunctionSignature(new SmallerEqualCodeGenerator(), CHARACTER, CHARACTER, BOOLEAN)
 		);
 
-		new FunctionSignatures(Punctuator.EQUAL,
+		new FunctionSignatures(Punctuator.EQUAL, Promotable.NOT_PROMOTABLE,
 				new FunctionSignature(new EqualCodeGenerator(), INTEGER, INTEGER, BOOLEAN),
+				new FunctionSignature(new EqualCodeGenerator(), INTEGER, BOOLEAN, BOOLEAN),
 				new FunctionSignature(new EqualCodeGenerator(), FLOATING, FLOATING, BOOLEAN),
 				new FunctionSignature(new EqualCodeGenerator(), CHARACTER, CHARACTER, BOOLEAN),
 				new FunctionSignature(new EqualCodeGenerator(), BOOLEAN, BOOLEAN, BOOLEAN),
 				new FunctionSignature(new EqualCodeGenerator(), STRING, STRING, BOOLEAN)
 		);
 
-		new FunctionSignatures(Punctuator.NOT_EQUAL,
+		new FunctionSignatures(Punctuator.NOT_EQUAL, Promotable.NOT_PROMOTABLE,
 				new FunctionSignature(new NotEqualCodeGenerator(), INTEGER, INTEGER, BOOLEAN),
 				new FunctionSignature(new NotEqualCodeGenerator(), FLOATING, FLOATING, BOOLEAN),
 				new FunctionSignature(new NotEqualCodeGenerator(), CHARACTER, CHARACTER, BOOLEAN),
@@ -142,22 +149,27 @@ public class FunctionSignatures extends ArrayList<FunctionSignature> {
 				new FunctionSignature(new NotEqualCodeGenerator(), STRING, STRING, BOOLEAN)
 		);
 
-		new FunctionSignatures(Punctuator.TYPE_CAST,
+		new FunctionSignatures(Punctuator.TYPE_CAST, Promotable.NOT_PROMOTABLE,
+				new FunctionSignature(new TypeCastCodeGenerator(), FLOATING, FLOATING, FLOATING),
 				new FunctionSignature(new TypeCastCodeGenerator(), FLOATING, INTEGER, FLOATING),
+				new FunctionSignature(new TypeCastCodeGenerator(), INTEGER, INTEGER, INTEGER),
 				new FunctionSignature(new TypeCastCodeGenerator(), INTEGER, FLOATING, INTEGER),
 				new FunctionSignature(new TypeCastCodeGenerator(), INTEGER, CHARACTER, INTEGER),
+				new FunctionSignature(new TypeCastCodeGenerator(), CHARACTER, CHARACTER, CHARACTER),
 				new FunctionSignature(new TypeCastCodeGenerator(), CHARACTER, INTEGER, CHARACTER),
+				new FunctionSignature(new TypeCastCodeGenerator(), BOOLEAN, BOOLEAN, BOOLEAN),
 				new FunctionSignature(new TypeCastCodeGenerator(), BOOLEAN, INTEGER, BOOLEAN),
 				new FunctionSignature(new TypeCastCodeGenerator(), BOOLEAN, CHARACTER, BOOLEAN),
 				new FunctionSignature(new TypeCastCodeGenerator(), STRING, STRING, STRING)
 		);
 
-		// use semantic analysis to set what T is
-		// define Array and Indexing
+
+		/*
 		TypeVariable T = new TypeVariable("T");
-		new FunctionSignatures(Punctuator.INDEXING,
-				new FunctionSignature(new Array(T), INTEGER, T)
+		new FunctionSignatures(Punctuator.INDEXING, Promotable.NOT_PROMOTABLE,
+				new FunctionSignature(new ArrayIndexingCodeGenerator(), new Array(T), INTEGER, T)
 		);
+		 */
 		
 		// First, we use the operator itself (in this case the Punctuator ADD) as the key.
 		// Then, we give that key two signatures: one an (INT x INT -> INT) and the other

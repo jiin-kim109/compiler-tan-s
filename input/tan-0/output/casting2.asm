@@ -28,10 +28,7 @@
         DataC        32                        %% " "
         DataC        0                         
         DLabel       $print-format-tab         
-        DataC        32                        %% "    "
-        DataC        32                        
-        DataC        32                        
-        DataC        32                        
+        DataC        9                         %% "\t"
         DataC        0                         
         DLabel       $boolean-true-string      
         DataC        116                       %% "true"
@@ -157,7 +154,9 @@
         PushI        0                         
         Add                                    %% r
         PushI        0                         
+        Nop                                    
         PushI        97                        
+        Nop                                    
         Exchange                               
         Pop                                    
         StoreI                                 
@@ -173,7 +172,9 @@
         PushI        4                         
         Add                                    %% r2
         PushI        0                         
+        Nop                                    
         PushI        68                        
+        Nop                                    
         Exchange                               
         Pop                                    
         StoreC                                 
@@ -189,7 +190,9 @@
         PushI        5                         
         Add                                    %% r3
         PushI        0                         
+        Nop                                    
         PushI        68                        
+        Nop                                    
         Exchange                               
         Pop                                    
         JumpPos      -compare-1-true           
@@ -220,7 +223,9 @@
         PushI        6                         
         Add                                    %% r4
         PushI        0                         
+        Nop                                    
         PushI        97                        
+        Nop                                    
         Exchange                               
         Pop                                    
         JumpPos      -compare-3-true           

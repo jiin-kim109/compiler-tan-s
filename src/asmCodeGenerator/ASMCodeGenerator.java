@@ -13,7 +13,6 @@ import lexicalAnalyzer.Lextant;
 import lexicalAnalyzer.Punctuator;
 import parseTree.*;
 import parseTree.nodeTypes.*;
-import semanticAnalyzer.signatures.FunctionSignature;
 import semanticAnalyzer.signatures.PromotedSignature;
 import semanticAnalyzer.types.PrimitiveType;
 import semanticAnalyzer.types.Type;
@@ -275,9 +274,10 @@ public class ASMCodeGenerator {
 
 		private List<ASMCodeFragment> childValueCode(OperatorNode node) {
 			List<ASMCodeFragment> result = new ArrayList<>();
-			for (ParseNode child: node.getChildren()) {
+			for (int i=0; i<node.getChildren().size(); i++) {
+				ParseNode child = node.getChildren().get(i);
 				ASMCodeFragment code = removeValueCode(child);
-				code.append(signature.promotion(i).codeFor());
+				code.append(node.getSignature().promotion(i).codeFor());
 				result.add(code);
 			}
 			return result;
@@ -377,7 +377,7 @@ public class ASMCodeGenerator {
 
 		public void visit(StringConstantNode node) {
 			newValueCode(node);
-			String address = node.getValue().replaceAll("\\s+","");
+			String address = Integer.toString(StringConstantNode.addressCounter());
 
 			code.add(DLabel, address);
 			code.add(DataI, 3);
@@ -395,7 +395,7 @@ public class ASMCodeGenerator {
 			code.add(PushF, node.getValue());
 		}
 
-		public void visit(TypecastNode node) {
+		public void visit(TypeNode node) {
 			newValueCode(node);
 
 			code.add(PushI, 0);

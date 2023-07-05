@@ -88,12 +88,12 @@ public class Parser {
 	
 	// statement-> declaration | printStmt
 	private ParseNode parseStatement() {
-		if(startsBlock(nowReading)) {
-			return parseBlock();
-		}
-
 		if(!startsStatement(nowReading)) {
 			return syntaxErrorNode("statement");
+		}
+
+		if(startsBlock(nowReading)) {
+			return parseBlock();
 		}
 		if(startsDeclaration(nowReading)) {
 			return parseDeclaration();
@@ -258,7 +258,7 @@ public class Parser {
 		if (nowReading.isLextant(Punctuator.GREATER, Punctuator.GREATER_OR_EQUAL, Punctuator.SMALLER, Punctuator.SMALLER_OR_EQUAL, Punctuator.EQUAL, Punctuator.NOT_EQUAL)) {
 			Token comparisonToken = nowReading;
 			readToken();
-			ParseNode right = parseAdditiveExpression();
+			ParseNode right = parseComparisonExpression();
 			return OperatorNode.withChildren(comparisonToken, left, right);
 		}
 
@@ -348,7 +348,7 @@ public class Parser {
 
 		if (nowReading.isLextant(Punctuator.TYPE_CAST)) {
 			Token typecastToken = nowReading;
-			ParseNode typeNode = new TypecastNode(typecastToken);
+			ParseNode typeNode = new TypeNode(typecastToken);
 			readToken();
 			if (!startsParenthesisExpression(nowReading)) {
 				return syntaxErrorNode("casting expression");

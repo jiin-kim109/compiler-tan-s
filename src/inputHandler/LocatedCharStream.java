@@ -85,4 +85,7 @@ public class LocatedCharStream implements Iterator<LocatedChar> {
 		throw new UnsupportedOperationException();
 	}
 
+	public static boolean isEndOfInput(LocatedChar lc) {
+		return lc == LocatedCharStream.FLAG_END_OF_INPUT;
+	}
 }

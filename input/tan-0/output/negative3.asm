@@ -28,10 +28,7 @@
         DataC        32                        %% " "
         DataC        0                         
         DLabel       $print-format-tab         
-        DataC        32                        %% "    "
-        DataC        32                        
-        DataC        32                        
-        DataC        32                        
+        DataC        9                         %% "\t"
         DataC        0                         
         DLabel       $boolean-true-string      
         DataC        116                       %% "true"
@@ -158,13 +155,18 @@
         Add                                    %% neg
         Label        -Operator-4-args          
         PushI        2                         
+        Nop                                    
         Label        -Operator-3-args          
         Label        -Operator-2-args          
         Label        -Operator-1-args          
         PushI        11                        
+        Nop                                    
         Negate                                 
+        Nop                                    
         Negate                                 
+        Nop                                    
         Negate                                 
+        Nop                                    
         Add                                    
         StoreI                                 
         PushD        $global-memory-block      

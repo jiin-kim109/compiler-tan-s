@@ -35,16 +35,32 @@ public class FunctionSignature {
 		for (Type type : paramTypes) {
 			type.addTypeVariables(typeVariables);
 		}
-		resultType.addTypeVariables(resultType);
+		resultType.addTypeVariables(typeVariables);
 	}
+
+	public List<Type> typeVariableSettings() {
+		List<Type> results = new ArrayList<Type>();
+		for (TypeVariable typeVariable : typeVariables) {
+			results.add(typeVariable.concreteType());
+		}
+		return results;
+	}
+
+	public void setTypeVariables(List<Type> typeVariableSettings) {
+		int i = 0;
+		for (TypeVariable typeVariable : typeVariables) {
+			typeVariable.setContraint(typeVariableSettings.get(i));
+			i += 1;
+		}
+	}
+
 	private void storeParamTypes(Type[] types) {
 		paramTypes = new Type[types.length-1];
 		for(int i=0; i<types.length-1; i++) {
 			paramTypes[i] = types[i];
 		}
 	}
-	
-	
+
 	///////////////////////////////////////////////////////////////
 	// accessors
 	
@@ -63,7 +79,7 @@ public class FunctionSignature {
 	// main query
 
 	public boolean accepts(List<Type> types) {
-		if (type.size() != paramTytpes.length) {
+		if (types.size() != paramTypes.length) {
 			return false;
 		}
 		resetTypeVariables();
@@ -125,22 +141,6 @@ public class FunctionSignature {
 
 		default:
 			return neverMatchedSignature;
-		}
-	}
-
-	public List<Type> typeVariableSettings() {
-		List<Type> results = new ArrayList<Type>();
-		for (TypeVariable typeVariable : typeVariables) {
-			results.add(typeVariable.concreteType());
-		}
-		return results;
-	}
-
-	public void setTypeVariables(List<Type> typeVariableSettings) {
-		int i = 0;
-		for (TypeVariable typeVariable : typeVariables) {
-			typeVariable.setContraint(typeVariableSettings.get(i));
-			i += 1;
 		}
 	}
 }

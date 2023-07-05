@@ -28,10 +28,7 @@
         DataC        32                        %% " "
         DataC        0                         
         DLabel       $print-format-tab         
-        DataC        32                        %% "    "
-        DataC        32                        
-        DataC        32                        
-        DataC        32                        
+        DataC        9                         %% "\t"
         DataC        0                         
         DLabel       $boolean-true-string      
         DataC        116                       %% "true"
@@ -196,44 +193,64 @@
         PushI        0                         
         Add                                    %% toonies
         LoadI                                  
+        Nop                                    
         PushI        200                       
+        Nop                                    
         Multiply                               
+        Nop                                    
         Label        -Operator-2-args          
         PushD        $global-memory-block      
         PushI        4                         
         Add                                    %% loonies
         LoadI                                  
+        Nop                                    
         PushI        100                       
+        Nop                                    
         Multiply                               
+        Nop                                    
         Add                                    
+        Nop                                    
         Label        -Operator-4-args          
         PushD        $global-memory-block      
         PushI        8                         
         Add                                    %% quarters
         LoadI                                  
+        Nop                                    
         PushI        25                        
+        Nop                                    
         Multiply                               
+        Nop                                    
         Add                                    
+        Nop                                    
         Label        -Operator-6-args          
         PushD        $global-memory-block      
         PushI        12                        
         Add                                    %% dimes
         LoadI                                  
+        Nop                                    
         PushI        10                        
+        Nop                                    
         Multiply                               
+        Nop                                    
         Add                                    
+        Nop                                    
         Label        -Operator-8-args          
         PushD        $global-memory-block      
         PushI        16                        
         Add                                    %% nickels
         LoadI                                  
+        Nop                                    
         PushI        5                         
+        Nop                                    
         Multiply                               
+        Nop                                    
         Add                                    
+        Nop                                    
         PushD        $global-memory-block      
         PushI        20                        
         Add                                    %% pennies
         LoadI                                  
+        Nop                                    
         Add                                    
         StoreI                                 
         PushD        $global-memory-block      
@@ -256,30 +273,40 @@
         PushI        0                         
         Add                                    %% toonies
         LoadI                                  
+        Nop                                    
         PushD        $global-memory-block      
         PushI        4                         
         Add                                    %% loonies
         LoadI                                  
+        Nop                                    
         Add                                    
+        Nop                                    
         PushD        $global-memory-block      
         PushI        8                         
         Add                                    %% quarters
         LoadI                                  
+        Nop                                    
         Add                                    
+        Nop                                    
         PushD        $global-memory-block      
         PushI        12                        
         Add                                    %% dimes
         LoadI                                  
+        Nop                                    
         Add                                    
+        Nop                                    
         PushD        $global-memory-block      
         PushI        16                        
         Add                                    %% nickels
         LoadI                                  
+        Nop                                    
         Add                                    
+        Nop                                    
         PushD        $global-memory-block      
         PushI        20                        
         Add                                    %% pennies
         LoadI                                  
+        Nop                                    
         Add                                    
         StoreI                                 
         PushD        $global-memory-block      

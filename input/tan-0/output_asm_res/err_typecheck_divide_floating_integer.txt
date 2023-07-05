@@ -1,0 +1,1 @@
+Bad operand type for JumpFZero instruction at location 18.

@@ -28,10 +28,7 @@
         DataC        32                        %% " "
         DataC        0                         
         DLabel       $print-format-tab         
-        DataC        32                        %% "    "
-        DataC        32                        
-        DataC        32                        
-        DataC        32                        
+        DataC        9                         %% "\t"
         DataC        0                         
         DLabel       $boolean-true-string      
         DataC        116                       %% "true"
@@ -157,7 +154,9 @@
         PushI        0                         
         Add                                    %% r
         PushI        0                         
+        Nop                                    
         PushI        5                         
+        Nop                                    
         Exchange                               
         Pop                                    
         ConvertF                               
@@ -174,7 +173,9 @@
         PushI        8                         
         Add                                    %% b
         PushI        0                         
+        Nop                                    
         PushF        4.500000                  
+        Nop                                    
         Exchange                               
         Pop                                    
         ConvertI                               

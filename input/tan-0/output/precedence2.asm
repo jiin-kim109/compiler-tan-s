@@ -28,10 +28,7 @@
         DataC        32                        %% " "
         DataC        0                         
         DLabel       $print-format-tab         
-        DataC        32                        %% "    "
-        DataC        32                        
-        DataC        32                        
-        DataC        32                        
+        DataC        9                         %% "\t"
         DataC        0                         
         DLabel       $boolean-true-string      
         DataC        116                       %% "true"
@@ -161,21 +158,33 @@
         Label        -Operator-2-args          
         Label        -Operator-1-args          
         PushI        3                         
+        Nop                                    
         PushI        4                         
+        Nop                                    
         Add                                    
+        Nop                                    
         PushI        2                         
+        Nop                                    
         Multiply                               
+        Nop                                    
         PushI        7                         
+        Nop                                    
         Add                                    
+        Nop                                    
         Label        -Operator-5-args          
         Label        -Operator-4-args          
         PushI        6                         
+        Nop                                    
         Negate                                 
+        Nop                                    
         Negate                                 
+        Nop                                    
         PushI        2                         
+        Nop                                    
         Duplicate                              
         JumpFalse    $$i-divide-by-zero        
         Divide                                 
+        Nop                                    
         Subtract                               
         StoreI                                 
         PushD        $global-memory-block      
