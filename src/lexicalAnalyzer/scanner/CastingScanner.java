@@ -48,7 +48,6 @@ public class CastingScanner extends TokenScanner {
         }
 
         if (Punctuator.GREATER.equals(next.getCharacter())) {
-            backupPrefix.remove(0);
             while (!backupPrefix.isEmpty()) {
                 input.pushback(backupPrefix.pop());
             }

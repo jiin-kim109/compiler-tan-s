@@ -71,11 +71,11 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		
 		IdentifierNode identifier = (IdentifierNode) node.child(0);
 		ParseNode initializer = node.child(1);
-		
+
 		Type declarationType = initializer.getType();
 		node.setType(declarationType);
-		
 		identifier.setType(declarationType);
+
 		Constancy constancy = (node.getToken().isLextant(Keyword.CONST)) ?
 				Constancy.IS_CONSTANT :
 				Constancy.IS_VARIABLE;
@@ -89,7 +89,8 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 			return;
 		}
 
-		IdentifierNode identifier = (IdentifierNode) node.child(0);
+		ParseNode identifier = node.child(0);
+		assert identifier instanceof IdentifierNode || identifier instanceof ArrayIndexNode;
 		ParseNode expression = node.child(1);
 
 		Type expressionType = expression.getType();
@@ -100,7 +101,7 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 			semanticError("types don't match in assignment statement");
 			return;
 		}
-		if (identifier.getBinding().isConstant()) {
+		if (identifier instanceof IdentifierNode && ((IdentifierNode) identifier).getBinding().isConstant()) {
 			semanticError("reassignment to const identifier");
 			return;
 		}
@@ -156,6 +157,13 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		}
 		typeCheckError(node, childTypes);
 		return PromotedSignature.nullInstance();
+	}
+
+	@Override
+	public void visitLeave(ArrayIndexNode node) {
+		ParseNode identifier = node.identifier();
+		assert identifier.getType() instanceof Array;
+		node.setType(((Array) identifier.getType()).getSubType());
 	}
 
 	@Override
@@ -236,13 +244,6 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 			node.setBinding(binding);
 		}
 		// else parent DeclarationNode does the processing.
-	}
-
-	@Override
-	public void visit(ArrayIndexNode node) {
-		ParseNode identifier = node.identifier();
-		assert identifier.getType() instanceof Array;
-		node.setType(((Array) identifier.getType()).getSubType());
 	}
 
 	private boolean isBeingDeclared(IdentifierNode node) {

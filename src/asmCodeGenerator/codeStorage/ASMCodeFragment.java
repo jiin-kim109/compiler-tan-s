@@ -43,6 +43,7 @@ public class ASMCodeFragment {
 	public void markAsAddress() {
 		codeType = CodeType.GENERATES_ADDRESS;
 	}
+	public CodeType getCodeType() { return codeType; }
 	public boolean isAddress() {
 		return codeType == CodeType.GENERATES_ADDRESS;
 	}

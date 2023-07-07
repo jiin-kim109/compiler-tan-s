@@ -39,16 +39,18 @@ public class LexicalAnalyzer extends ScannerImp implements Scanner {
 		Optional<Token> token = Optional.ofNullable(
 				DigitScanner.scan(ch, input).orElse(
 						CharacterScanner.scan(ch, input).orElse(
-							StringScanner.scan(ch, input).orElse(
-								IdentifierScanner.scan(ch, input).orElse(
+								StringScanner.scan(ch, input).orElse(
 										CastingScanner.scan(ch, input).orElse(
 												PunctuatorScanner.scan(ch, input).orElse(
+														IdentifierScanner.scan(ch, input).orElse(
 														null
+														)
 												)
 										)
 								)
 						)
-				)));
+				)
+		);
 		Token nextToken = token.orElseGet(() -> {
 			lexicalError(ch);
 			return findNextToken();

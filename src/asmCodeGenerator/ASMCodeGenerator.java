@@ -14,6 +14,7 @@ import lexicalAnalyzer.Punctuator;
 import parseTree.*;
 import parseTree.nodeTypes.*;
 import semanticAnalyzer.signatures.PromotedSignature;
+import semanticAnalyzer.types.Array;
 import semanticAnalyzer.types.PrimitiveType;
 import semanticAnalyzer.types.Type;
 import symbolTable.Binding;
@@ -237,6 +238,9 @@ public class ASMCodeGenerator {
 			}
 			if(type == PrimitiveType.BOOLEAN) {
 				return StoreC;
+			}
+			if(type instanceof Array) {
+				return StoreI;
 			}
 			assert false: "Type " + type + " unimplemented in opcodeForStore()";
 			return null;

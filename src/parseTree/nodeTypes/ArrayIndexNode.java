@@ -30,6 +30,8 @@ public class ArrayIndexNode extends ParseNode {
 // accept a visitor
 	
 	public void accept(ParseNodeVisitor visitor) {
-		visitor.visit(this);
+		visitor.visitEnter(this);
+		visitChildren(visitor);
+		visitor.visitLeave(this);
 	}
 }

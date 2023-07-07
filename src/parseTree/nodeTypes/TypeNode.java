@@ -9,6 +9,7 @@ import semanticAnalyzer.types.Array;
 import semanticAnalyzer.types.PrimitiveType;
 import semanticAnalyzer.types.Type;
 import tokens.LextantToken;
+import tokens.StringLiteralToken;
 import tokens.Token;
 import tokens.TypeLiteralToken;;
 
@@ -26,10 +27,6 @@ public class TypeNode extends ParseNode {
 
 ////////////////////////////////////////////////////////////
 // attributes
-
-	public LextantToken getToken() {
-		return (LextantToken)token;
-	}
 
 ///////////////////////////////////////////////////////////
 // accept a visitor

@@ -1,8 +1,11 @@
 main {
-	const a := new [[float]](3);
-	[a:0] = [3.1, 5.0];
-	[a:1] = [1, 'a'];
+    var t := <float>(3);
+	const a := new [int](4);
+	[a:0] = 1;
+	[a:1] = 2;
+	[a:2] = 0;
 	print a \n;
-	var b = [[1], [5], [7], new [int](4)];
+	var b = [3, 5, 7, 10];
 	print b \n;
+	print [a:[a:[a:0]]] \n ;
 }

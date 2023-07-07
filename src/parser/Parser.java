@@ -118,10 +118,9 @@ public class Parser {
 			return syntaxErrorNode("print statement");
 		}
 		ParseNode result = new PrintStatementNode(nowReading);
-		
 		readToken();
 		result = parsePrintExpressionList(result);
-		
+
 		expect(Punctuator.TERMINATOR);
 		return result;
 	}
@@ -354,33 +353,32 @@ public class Parser {
 		}
 
 		if (nowReading.isLextant(Punctuator.OPEN_SQUARE)) {
-			Token arrayToken = nowReading;
+			Token listOpenToken = nowReading;
 			readToken();
 			ParseNode expression = parseExpression();
 			if (expression instanceof TypeNode) { // array type
-				readToken();
 				expect(Punctuator.CLOSE_SQUARE);
-				return TypeNode.arrayOf(arrayToken, (TypeNode) expression);
+				return TypeNode.arrayOf(expression.getToken(), (TypeNode) expression);
 			}
 			else if (expression instanceof IdentifierNode) { // array indexing
-				readToken();
 				assert nowReading.isLextant(Punctuator.INDEXING);
 				Token indexToken = nowReading;
+				readToken();
 				ParseNode indexExpression = parseExpression();
 				expect(Punctuator.CLOSE_SQUARE);
-				return ArrayIndexNode.make(indexToken, expression, indexExpression);
+				//return ArrayIndexNode.make(indexToken, expression, indexExpression);
+				return OperatorNode.withChildren(indexToken, expression, indexExpression);
 			}
 			else { // array expression list
 				List<ParseNode> listElements = new ArrayList<>();
 				listElements.add(expression);
-				readToken();
 				while (nowReading.isLextant(Punctuator.LIST_DELIMITER)) {
 					readToken();
 					listElements.add(parseExpression());
 					readToken();
 				}
 				expect(Punctuator.CLOSE_SQUARE);
-				return ExpressionListNode.withElements(arrayToken, listElements);
+				return ExpressionListNode.withElements(listOpenToken, listElements);
 			}
 		}
 		return parseCastingExpression();
@@ -399,8 +397,7 @@ public class Parser {
 		if (nowReading.isLextant(Punctuator.TYPE_CAST)) {
 			Token typeToken = nowReading;
 			readToken();
-
-			ParseNode typeNode = parseExpression();
+			ParseNode typeNode = parseTypeLiteral();
 			assert (typeNode instanceof TypeNode);
 			expect(Punctuator.GREATER);
 			if (!startsParenthesisExpression(nowReading)) {

@@ -1,0 +1,5 @@
+main {
+	const a := new [int](2);
+	[a:-1] = 1;
+	print a \n;
+}
