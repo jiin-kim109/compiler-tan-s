@@ -44,11 +44,6 @@ public class TypeVariable implements Type {
 	}
 
 	@Override
-	public void addTypeVariables(Set<TypeVariable> typeVariables) {
-		typeVariables.add(this);
-	}
-
-	@Override
 	public Type concreteType() {
 		return constraint.concreteType();
 	}

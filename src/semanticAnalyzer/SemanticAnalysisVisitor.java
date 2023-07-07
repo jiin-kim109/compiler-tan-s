@@ -3,16 +3,17 @@ package semanticAnalyzer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.IntStream;
 
 import lexicalAnalyzer.Keyword;
-import lexicalAnalyzer.Punctuator;
 import logging.TanLogger;
 import parseTree.ParseNode;
 import parseTree.ParseNodeVisitor;
 import parseTree.nodeTypes.*;
-import semanticAnalyzer.signatures.FunctionSignature;
 import semanticAnalyzer.signatures.FunctionSignatures;
 import semanticAnalyzer.signatures.PromotedSignature;
+import semanticAnalyzer.signatures.Promotion;
+import semanticAnalyzer.types.Array;
 import semanticAnalyzer.types.PrimitiveType;
 import semanticAnalyzer.types.Type;
 import symbolTable.Binding;
@@ -157,6 +158,36 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		return PromotedSignature.nullInstance();
 	}
 
+	@Override
+	public void visitLeave(ExpressionListNode node) {
+		if (node.hasDefinedType()) { // has type defined
+			ParseNode type = node.getTypeNode();
+			assert (type instanceof TypeNode);
+			node.setType(type.getType());
+		}
+		else if (node.containPrimitive() && node.containNonPrimitive()) { // not valid
+			typeCheckError(node, node.childTypes());
+			return;
+		}
+		else {
+			if (node.containNonPrimitive()) { // if non-primitive element, all the elements should have the same type
+				if (!node.checkChildrenHaveTheSameType()) {
+					typeCheckError(node, node.childTypes());
+					return;
+				}
+				node.setType(node.first().getType());
+			}
+			else { // promote primitive to the nearest
+				node.promoteTo(Promotion.CHAR_TO_INT);
+				node.setType(new Array(PrimitiveType.INTEGER));
+				if (!node.checkChildrenHaveTheSameType()) {
+					node.promoteTo(Promotion.INT_TO_FLOAT);
+					node.setType(new Array(PrimitiveType.FLOATING));
+				}
+			}
+		}
+	}
+
 	///////////////////////////////////////////////////////////////////////////
 	// simple leaf nodes
 	@Override
@@ -181,7 +212,7 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 	public void visit(StringConstantNode node) { node.setType(PrimitiveType.STRING); }
 	@Override
 	public void visit(TypeNode node) {
-		node.setType(node.primitiveType());
+		node.setType(node.getType());
 	}
 	@Override
 	public void visit(NewlineNode node) {
@@ -206,6 +237,14 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		}
 		// else parent DeclarationNode does the processing.
 	}
+
+	@Override
+	public void visit(ArrayIndexNode node) {
+		ParseNode identifier = node.identifier();
+		assert identifier.getType() instanceof Array;
+		node.setType(((Array) identifier.getType()).getSubType());
+	}
+
 	private boolean isBeingDeclared(IdentifierNode node) {
 		ParseNode parent = node.getParent();
 		return (parent instanceof DeclarationNode) && (node == parent.child(0));
@@ -225,9 +264,13 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 
 	private void typeCheckError(ParseNode node, List<Type> operandTypes) {
 		Token token = node.getToken();
-		
 		logError("operator " + token.getLexeme() + " not defined for types " 
 				 + operandTypes  + " at " + token.getLocation());	
+	}
+
+	private void typeCheckError(ParseNode node) {
+		Token token = node.getToken();
+		logError("type " + token.getLexeme() + " does not match with children " + " at " + token.getLocation());
 	}
 
 	private void semanticError(String errorMessage) {

@@ -1,0 +1,6 @@
+main {
+	const a := 3 + 'b' + 1;
+	print a \n;
+	var b = 'a' / 3 + (2.0 + 'b');
+	print b \n;
+}

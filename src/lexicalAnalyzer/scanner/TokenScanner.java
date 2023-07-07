@@ -18,11 +18,6 @@ public abstract class TokenScanner {
         return false;
     }
 
-    protected void lexicalError(LocatedChar ch) {
-        TanLogger log = TanLogger.getLogger("compiler.lexicalAnalyzer");
-        log.severe("Lexical error: invalid character " + ch);
-    }
-
     protected void lexicalError(String errorMsg, LocatedChar decimal) {
         TanLogger log = TanLogger.getLogger("compiler.lexicalAnalyzer");
         log.severe("Lexical error: " + errorMsg + " at " + decimal.getLocation());

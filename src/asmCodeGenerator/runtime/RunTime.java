@@ -1,6 +1,8 @@
 package asmCodeGenerator.runtime;
 import static asmCodeGenerator.codeStorage.ASMCodeFragment.CodeType.*;
 import static asmCodeGenerator.codeStorage.ASMOpcode.*;
+
+import asmCodeGenerator.ASMCodeGenerator;
 import asmCodeGenerator.codeStorage.ASMCodeFragment;
 public class RunTime {
 	public static final String EAT_LOCATION_ZERO      = "$eat-location-zero";		// helps us distinguish null pointers from real ones.
@@ -22,6 +24,7 @@ public class RunTime {
 	public static final String INTEGER_DIVIDE_BY_ZERO_RUNTIME_ERROR = "$$i-divide-by-zero";
 	public static final String FLOATING_DIVIDE_BY_ZERO_RUNTIME_ERROR = "$$f-divide-by-zero";
 	public static final String BAD_COMPARISON_OPERAND_RUNTIME_ERROR = "$$bad-comparison-operand";
+	public static final String BAD_TYPECAST_OPERAND_RUNTIME_ERROR = "$$bad-typecast-operand";
 
 	private ASMCodeFragment environmentASM() {
 		ASMCodeFragment result = new ASMCodeFragment(GENERATES_VOID);
@@ -74,6 +77,7 @@ public class RunTime {
 		integerDivideByZeroError(frag);
 		floatingDivideByZeroError(frag);
 		badOperandError(frag);
+		badTypecastError(frag);
 		
 		return frag;
 	}
@@ -120,6 +124,18 @@ public class RunTime {
 		frag.add(Label, BAD_COMPARISON_OPERAND_RUNTIME_ERROR);
 		frag.add(PushD, badComparisonOperandMessage);
 		frag.add(Jump, GENERAL_RUNTIME_ERROR);
+	}
+
+	private void badTypecastError(ASMCodeFragment frag) {
+		String badTypecastOperandMessage = "$errors-bad-typecast-operand";
+
+		frag.add(DLabel, badTypecastOperandMessage);
+		frag.add(DataS, "bad comparison operand");
+
+		frag.add(Label, BAD_TYPECAST_OPERAND_RUNTIME_ERROR);
+		frag.add(PushD, badTypecastOperandMessage);
+		frag.add(Jump, GENERAL_RUNTIME_ERROR);
+
 	}
 	
 	

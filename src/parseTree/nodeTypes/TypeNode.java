@@ -2,22 +2,26 @@ package parseTree.nodeTypes;
 
 import lexicalAnalyzer.Keyword;
 import lexicalAnalyzer.Punctuator;
+import lexicalAnalyzer.TypeLiteral;
 import parseTree.ParseNode;
 import parseTree.ParseNodeVisitor;
+import semanticAnalyzer.types.Array;
 import semanticAnalyzer.types.PrimitiveType;
+import semanticAnalyzer.types.Type;
 import tokens.LextantToken;
-import tokens.Token;;
+import tokens.Token;
+import tokens.TypeLiteralToken;;
 
 public class TypeNode extends ParseNode {
 
 	public TypeNode(Token token) {
 		super(token);
-		assert(token instanceof LextantToken);
-		assert(token.isLextant(Punctuator.TYPE_CAST));
-		assert(token.getLexeme().length() > 2);
 	}
-	public TypeNode(ParseNode node) {
-		super(node);
+
+	public static TypeNode arrayOf(Token token, TypeNode subtype) {
+		TypeNode node = new TypeNode(token);
+		node.setType(new Array(subtype.getType()));
+		return node;
 	}
 
 ////////////////////////////////////////////////////////////
@@ -27,20 +31,10 @@ public class TypeNode extends ParseNode {
 		return (LextantToken)token;
 	}
 
-	public PrimitiveType primitiveType() {
-		return Keyword.toPrimitive(keyword());
-	}
-
-	public Keyword keyword() {
-		String lexeme = getToken().getLexeme();
-		return Keyword.forLexeme(lexeme.substring(1, lexeme.length()-1));
-	}
-
 ///////////////////////////////////////////////////////////
 // accept a visitor
 	
 	public void accept(ParseNodeVisitor visitor) {
 		visitor.visit(this);
 	}
-
 }

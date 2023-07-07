@@ -1,15 +1,14 @@
 package parser;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
+import lexicalAnalyzer.*;
 import logging.TanLogger;
 import parseTree.*;
 import parseTree.nodeTypes.*;
 import tokens.*;
-import lexicalAnalyzer.Keyword;
-import lexicalAnalyzer.Lextant;
-import lexicalAnalyzer.Punctuator;
-import lexicalAnalyzer.Scanner;
 
 
 public class Parser {
@@ -215,7 +214,9 @@ public class Parser {
 			return syntaxErrorNode("assignment");
 		}
 
-		ParseNode identifier = parseIdentifier();
+		ParseNode identifier = nowReading.isLextant(Punctuator.OPEN_SQUARE) ?
+				parseArrayExpression() :
+				parseIdentifier();
 		expect(Punctuator.ASSIGN);
 		Token assignmentToken = previouslyRead;
 		ParseNode initializer = parseExpression();
@@ -224,7 +225,7 @@ public class Parser {
 		return AssignmentStatementNode.withChildren(assignmentToken, identifier, initializer);
 	}
 	private boolean startsAssignment(Token token) {
-		return startsIdentifier(token);
+		return startsIdentifier(token) || token.isLextant(Punctuator.OPEN_SQUARE);
 	}
 	
 	///////////////////////////////////////////////////////////
@@ -258,7 +259,7 @@ public class Parser {
 		if (nowReading.isLextant(Punctuator.GREATER, Punctuator.GREATER_OR_EQUAL, Punctuator.SMALLER, Punctuator.SMALLER_OR_EQUAL, Punctuator.EQUAL, Punctuator.NOT_EQUAL)) {
 			Token comparisonToken = nowReading;
 			readToken();
-			ParseNode right = parseComparisonExpression();
+			ParseNode right = parseExpression();
 			return OperatorNode.withChildren(comparisonToken, left, right);
 		}
 
@@ -334,10 +335,61 @@ public class Parser {
 			ParseNode child = parseAtomicExpression();
 			return OperatorNode.withChildren(operatorToken, child);
 		}
-		return parseCastingExpression();
+		return parseArrayExpression();
 	}
 	private boolean startsUnaryExpression(Token token) {
-		return token.isLextant(Punctuator.SUBTRACT, Punctuator.ADD) || startsCastingExpression(token);
+		return token.isLextant(Punctuator.SUBTRACT, Punctuator.ADD) || startsArrayExpression(token);
+	}
+
+	// arrayExpression -> [ expressionList -> expression (,expression)* ] | CE
+	private ParseNode parseArrayExpression() {
+		if (!startsArrayExpression(nowReading)) {
+			return syntaxErrorNode("array expression");
+		}
+
+		if (nowReading.isLextant(Punctuator.OBJECT_CREATION)) {
+			Token arrayToken = nowReading;
+			readToken();
+			ParseNode typeNode = parseArrayExpression();
+			ParseNode sizeExpression = parseParenthesisExpression();
+			return ExpressionListNode.createEmpty(arrayToken, typeNode, sizeExpression);
+		}
+
+		if (nowReading.isLextant(Punctuator.OPEN_SQUARE)) {
+			Token arrayToken = nowReading;
+			readToken();
+			ParseNode expression = parseExpression();
+			if (expression instanceof TypeNode) { // array type
+				readToken();
+				expect(Punctuator.CLOSE_SQUARE);
+				return TypeNode.arrayOf(arrayToken, (TypeNode) expression);
+			}
+			else if (expression instanceof IdentifierNode) { // array indexing
+				readToken();
+				assert nowReading.isLextant(Punctuator.INDEXING);
+				Token indexToken = nowReading;
+				ParseNode indexExpression = parseExpression();
+				expect(Punctuator.CLOSE_SQUARE);
+				return ArrayIndexNode.make(indexToken, expression, indexExpression);
+			}
+			else { // array expression list
+				List<ParseNode> listElements = new ArrayList<>();
+				listElements.add(expression);
+				readToken();
+				while (nowReading.isLextant(Punctuator.LIST_DELIMITER)) {
+					readToken();
+					listElements.add(parseExpression());
+					readToken();
+				}
+				expect(Punctuator.CLOSE_SQUARE);
+				return ExpressionListNode.withElements(arrayToken, listElements);
+			}
+		}
+		return parseCastingExpression();
+	}
+
+	private boolean startsArrayExpression(Token token) {
+		return token.isLextant(Punctuator.OPEN_SQUARE, Punctuator.OBJECT_CREATION) || startsCastingExpression(token);
 	}
 
 	// castingExpression -> (CA)? ParenthesisExpression
@@ -347,14 +399,17 @@ public class Parser {
 		}
 
 		if (nowReading.isLextant(Punctuator.TYPE_CAST)) {
-			Token typecastToken = nowReading;
-			ParseNode typeNode = new TypeNode(typecastToken);
+			Token typeToken = nowReading;
 			readToken();
+
+			ParseNode typeNode = parseExpression();
+			assert (typeNode instanceof TypeNode);
+			expect(Punctuator.GREATER);
 			if (!startsParenthesisExpression(nowReading)) {
 				return syntaxErrorNode("casting expression");
 			}
-			ParseNode parenthesizedExpression  = parseParenthesisExpression();
-			return OperatorNode.withChildren(typecastToken, typeNode, parenthesizedExpression);
+			ParseNode parenthesizedExpression = parseParenthesisExpression();
+			return OperatorNode.withChildren(typeToken, typeNode, parenthesizedExpression);
 		}
 
 		return parseParenthesisExpression();
@@ -386,6 +441,9 @@ public class Parser {
 			return syntaxErrorNode("literal");
 		}
 
+		if(startsTypeLiteral(nowReading)) {
+			return parseTypeLiteral();
+		}
 		if(startsIntLiteral(nowReading)) {
 			return parseIntLiteral();
 		}
@@ -413,7 +471,8 @@ public class Parser {
 				startsCharLiteral(token) ||
 				startsStringLiteral(token) ||
 				startsIdentifier(token) ||
-				startsBooleanLiteral(token);
+				startsBooleanLiteral(token) ||
+				startsTypeLiteral(token);
 	}
 
 	// number (literal)
@@ -449,6 +508,17 @@ public class Parser {
 		return new StringConstantNode(previouslyRead);
 	}
 
+	private ParseNode parseTypeLiteral() {
+		if (!startsTypeLiteral(nowReading)) {
+			return syntaxErrorNode("type literal");
+		}
+		TypeLiteralToken typeLiteralToken = (TypeLiteralToken) nowReading;
+		TypeNode typeNode = new TypeNode(typeLiteralToken);
+		typeNode.setType(typeLiteralToken.primitive());
+		readToken();
+		return typeNode;
+	}
+
 	private boolean startsIntLiteral(Token token) {
 		return token instanceof IntegerLiteralToken;
 	}
@@ -464,6 +534,8 @@ public class Parser {
 	private boolean startsStringLiteral(Token token) {
 		return token instanceof StringLiteralToken;
 	}
+
+	private boolean startsTypeLiteral(Token token) { return token instanceof TypeLiteralToken; }
 
 	// identifier (terminal)
 	private ParseNode parseIdentifier() {

@@ -26,8 +26,12 @@ public enum Punctuator implements Lextant {
 	CLOSE_BRACE("}"),
 	OPEN_PARENTHESIS("("),
 	CLOSE_PARENTHESIS(")"),
-	TYPE_CAST(""),
 	INDEXING(":"),
+	OBJECT_CREATION("new"),
+	OPEN_SQUARE("["),
+	CLOSE_SQUARE("]"),
+	LIST_DELIMITER(","),
+	TYPE_CAST(""),
 	NULL_PUNCTUATOR("");
 
 	private String lexeme;

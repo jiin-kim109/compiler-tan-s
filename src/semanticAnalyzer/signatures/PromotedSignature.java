@@ -5,29 +5,55 @@ import semanticAnalyzer.types.Type;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class PromotedSignature {
     FunctionSignature signature;
     List<Promotion> promotions;
-    List<Type> typeVariableSettings;
+    List<Type> concreteParamTypes;
+    List<Type> concreteResultType;
 
     public PromotedSignature(FunctionSignature signature, List<Promotion> promotions) {
         this.signature = signature;
-        this.promotions = new ArrayList<Promotion>(promotions);
-        this.typeVariableSettings = signature.typeVariableSettings();
+        this.promotions = extendPromotionListSize(promotions, signature.numTypes());
     }
 
-    public int numPromotions() {
-        return promotions.stream().filter(promotion -> !promotion.isNull()).toList().size();
+    public boolean accepts(List<Type> childTypes) {
+        List<Type> promotedTypes = new ArrayList<>(childTypes);
+        for (int i=0; i<childTypes.size(); i++){
+            if (promotions.size() > i)
+                promotedTypes.set(i, promotions.get(i).apply(childTypes.get(i)));
+        }
+        return signature.accepts(promotedTypes);
+    }
+
+    private List<Promotion> extendPromotionListSize(List<Promotion> p, int size) {
+        assert p.size() <= size;
+        List<Promotion> promotions = new ArrayList<Promotion>(p);
+        for (int i=0; i<size-p.size(); i++) {
+            promotions.add(Promotion.NONE);
+        }
+        return promotions;
     }
 
     public Type resultType() {
-        setTypeVariables();
-        return signature.resultType().concreteType();
+        return promotions.get(promotions.size()-1).apply(signature.resultType().concreteType());
     }
-
-    private void setTypeVariables() {
-        signature.setTypeVariables(typeVariableSettings);
+    public List<Type> paramTypes() {
+        List<Type> promotedTypes = IntStream.range(0, paramTypes().size())
+                        .mapToObj(i -> promotions.get(i).apply(paramTypes().get(i).concreteType()))
+                        .collect(Collectors.toList());
+        return promotedTypes;
+    }
+    public Object getVariant() {
+        return signature.getVariant();
+    }
+    public int numPromotions() {
+        return promotions.stream().filter(promotion -> !promotion.isNull()).toList().size();
+    }
+    public Promotion promotion(int i) {
+        return promotions.get(i);
     }
 
     public static PromotedSignature nullInstance() {
@@ -71,22 +97,5 @@ public class PromotedSignature {
                 findAllRecursive(signature, types, promo, promoTypes, promotedSignatures, index+1);
             }
         }
-    }
-
-    public boolean accepts(List<Type> childTypes) {
-        List<Type> promotedTypes = new ArrayList<>(childTypes);
-        for (int i=0; i<childTypes.size(); i++){
-            if (promotions.size() > i)
-                promotedTypes.set(i, promotions.get(i).apply(childTypes.get(i)));
-        }
-        return signature.accepts(promotedTypes);
-    }
-
-    public Object getVariant() {
-        return signature.getVariant();
-    }
-
-    public Promotion promotion(int i) {
-        return promotions.get(i);
     }
 }

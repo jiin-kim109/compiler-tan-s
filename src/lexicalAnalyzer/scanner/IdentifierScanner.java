@@ -3,9 +3,11 @@ package lexicalAnalyzer.scanner;
 import inputHandler.LocatedChar;
 import inputHandler.PushbackCharStream;
 import lexicalAnalyzer.Keyword;
+import lexicalAnalyzer.TypeLiteral;
 import tokens.IdentifierToken;
 import tokens.LextantToken;
 import tokens.Token;
+import tokens.TypeLiteralToken;
 
 import java.util.Optional;
 
@@ -39,6 +41,9 @@ public class IdentifierScanner extends TokenScanner {
         String lexeme = buffer.toString();
         if(Keyword.isAKeyword(lexeme)) {
             return Optional.of(LextantToken.make(startingCharacter, lexeme, Keyword.forLexeme(lexeme)));
+        }
+        if(TypeLiteral.isATypeLiteral(lexeme)) {
+            return Optional.of(TypeLiteralToken.make(startingCharacter, lexeme));
         }
         else {
             return Optional.of(IdentifierToken.make(startingCharacter, lexeme));

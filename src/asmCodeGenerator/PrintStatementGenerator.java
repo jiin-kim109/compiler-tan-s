@@ -1,10 +1,8 @@
 package asmCodeGenerator;
 
 import parseTree.ParseNode;
-import parseTree.nodeTypes.HorizontalTabNode;
-import parseTree.nodeTypes.NewlineNode;
-import parseTree.nodeTypes.PrintStatementNode;
-import parseTree.nodeTypes.SpaceNode;
+import parseTree.nodeTypes.*;
+import semanticAnalyzer.types.Array;
 import semanticAnalyzer.types.PrimitiveType;
 import semanticAnalyzer.types.Type;
 import asmCodeGenerator.ASMCodeGenerator.CodeVisitor;
@@ -41,6 +39,10 @@ public class PrintStatementGenerator {
 	}
 
 	private void appendPrintCode(ParseNode node) {
+		if (node.getType() instanceof Array) {
+			printArray(node);
+			return;
+		}
 		String format = printFormat(node.getType());
 
 		code.append(visitor.removeValueCode(node));
@@ -70,16 +72,15 @@ public class PrintStatementGenerator {
 		if(node.getType() != PrimitiveType.STRING) {
 			return;
 		}
-
 		int bytesToShift = 12;
 		code.add(PushI, bytesToShift);
 		code.add(Add);
 	}
 
 
-	private static String printFormat(Type type) {
+	private String printFormat(Type type) {
 		assert type instanceof PrimitiveType;
-		
+
 		switch((PrimitiveType)type) {
 		case INTEGER:	return RunTime.INTEGER_PRINT_FORMAT;
 		case FLOATING:	return RunTime.FLOATING_PRINT_FORMAT;
@@ -90,5 +91,22 @@ public class PrintStatementGenerator {
 			assert false : "Type " + type + " unimplemented in PrintStatementGenerator.printFormat()";
 			return "";
 		}
+	}
+
+	private void printArray(ParseNode node) {
+		assert node instanceof ExpressionListNode;
+		assert node.getType() instanceof Array;
+		code.add(PushI, 91);
+		code.add(PushD, RunTime.CHARACTER_PRINT_FORMAT);
+		code.add(Printf);
+		for(ParseNode child : ((ExpressionListNode) node).getElements()) {
+			appendPrintCode(node);
+			code.add(PushI, 44);
+			code.add(PushD, RunTime.CHARACTER_PRINT_FORMAT);
+			code.add(Printf);
+		}
+		code.add(PushI, 93);
+		code.add(PushD, RunTime.CHARACTER_PRINT_FORMAT);
+		code.add(Printf);
 	}
 }

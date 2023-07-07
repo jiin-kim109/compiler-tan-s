@@ -79,6 +79,7 @@ public class FunctionSignatures extends ArrayList<FunctionSignature> {
 	// Put the signatures for operators in the following static block.
 	
 	static {
+		TypeVariable T = new TypeVariable("T");
 		// here's one example to get you started with FunctionSignatures: the signatures for addition.		
 		// for this to work, you should statically import PrimitiveType.*
 
@@ -160,16 +161,13 @@ public class FunctionSignatures extends ArrayList<FunctionSignature> {
 				new FunctionSignature(new TypeCastCodeGenerator(), BOOLEAN, BOOLEAN, BOOLEAN),
 				new FunctionSignature(new TypeCastCodeGenerator(), BOOLEAN, INTEGER, BOOLEAN),
 				new FunctionSignature(new TypeCastCodeGenerator(), BOOLEAN, CHARACTER, BOOLEAN),
-				new FunctionSignature(new TypeCastCodeGenerator(), STRING, STRING, STRING)
+				new FunctionSignature(new TypeCastCodeGenerator(), STRING, STRING, STRING),
+				new FunctionSignature(new TypeCastCodeGenerator(), new Array(T), new Array(T), new Array(T))
 		);
 
-
-		/*
-		TypeVariable T = new TypeVariable("T");
 		new FunctionSignatures(Punctuator.INDEXING, Promotable.NOT_PROMOTABLE,
-				new FunctionSignature(new ArrayIndexingCodeGenerator(), new Array(T), INTEGER, T)
+				new FunctionSignature(new ArrayIndexCodeGenerator(), new Array(T), INTEGER, T)
 		);
-		 */
 		
 		// First, we use the operator itself (in this case the Punctuator ADD) as the key.
 		// Then, we give that key two signatures: one an (INT x INT -> INT) and the other

@@ -58,53 +58,10 @@ public class LexicalAnalyzer extends ScannerImp implements Scanner {
 	}
 	
 	//////////////////////////////////////////////////////////////////////////////
-	// Punctuator lexical analysis	
-	// old method left in to show a simple scanning method.
-	// current method is the algorithm object PunctuatorScanner.java
-
-	@SuppressWarnings("unused")
-	private Token oldScanPunctuator(LocatedChar ch) {
-		
-		switch(ch.getCharacter()) {
-		case '*':
-			return LextantToken.make(ch, "*", Punctuator.MULTIPLY);
-		case '+':
-			return LextantToken.make(ch, "+", Punctuator.ADD);
-		case '>':
-			return LextantToken.make(ch, ">", Punctuator.GREATER);
-		case ':':
-			if(ch.getCharacter()=='=') {
-				return LextantToken.make(ch, ":=", Punctuator.ASSIGN);
-			}
-			else {
-				lexicalError(ch);
-				return(NullToken.make(ch));
-			}
-		case ',':
-			return LextantToken.make(ch, ",", Punctuator.PRINT_SEPARATOR);
-		case ';':
-			return LextantToken.make(ch, ";", Punctuator.TERMINATOR);
-		default:
-			lexicalError(ch);
-			return(NullToken.make(ch));
-		}
-	}
-	
-	//////////////////////////////////////////////////////////////////////////////
 	// Error-reporting	
 
 	private void lexicalError(LocatedChar ch) {
 		TanLogger log = TanLogger.getLogger("compiler.lexicalAnalyzer");
 		log.severe("Lexical error: invalid character " + ch);
-	}
-
-	private void lexicalError(String errorMsg, LocatedChar decimal) {
-		TanLogger log = TanLogger.getLogger("compiler.lexicalAnalyzer");
-		log.severe("Lexical error: " + errorMsg + " at " + decimal.getLocation());
-	}
-
-	private void lexicalError(String errorMsg, LocatedChar ch, String lexeme) {
-		TanLogger log = TanLogger.getLogger("compiler.lexicalAnalyzer");
-		log.severe("Lexical error: " + errorMsg + " at " + ch.getLocation() + ", while reading " + lexeme);
 	}
 }

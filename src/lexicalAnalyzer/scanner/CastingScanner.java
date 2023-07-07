@@ -4,6 +4,7 @@ import inputHandler.LocatedChar;
 import inputHandler.PushbackCharStream;
 import lexicalAnalyzer.Keyword;
 import lexicalAnalyzer.Punctuator;
+import lexicalAnalyzer.TypeLiteral;
 import semanticAnalyzer.types.PrimitiveType;
 import tokens.LextantToken;
 import tokens.Token;
@@ -46,10 +47,11 @@ public class CastingScanner extends TokenScanner {
             buffer.append(next.getCharacter());
         }
 
-        Keyword typeKeyword = Keyword.forLexeme(buffer.substring(1, buffer.length()-1));
-        PrimitiveType type = Keyword.toPrimitive(typeKeyword);
-
-        if (type != PrimitiveType.NO_TYPE && Punctuator.GREATER.equals(next.getCharacter())) {
+        if (Punctuator.GREATER.equals(next.getCharacter())) {
+            backupPrefix.remove(0);
+            while (!backupPrefix.isEmpty()) {
+                input.pushback(backupPrefix.pop());
+            }
             return Optional.of(LextantToken.make(startingCharacter, buffer.toString(), Punctuator.TYPE_CAST));
         }
         else {

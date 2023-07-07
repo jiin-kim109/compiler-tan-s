@@ -28,6 +28,9 @@ public interface ParseNodeVisitor {
 	void visitEnter(ProgramNode node);
 	void visitLeave(ProgramNode node);
 
+	void visitEnter(ExpressionListNode node);
+	void visitLeave(ExpressionListNode node);
+
 
 	// leaf nodes: visitLeaf only
 	void visit(BooleanConstantNode node);
@@ -38,6 +41,7 @@ public interface ParseNodeVisitor {
 	void visit(CharacterConstantNode node);
 	void visit(StringConstantNode node);
 	void visit(TypeNode node);
+	void visit(ArrayIndexNode node);
 	void visit(NewlineNode node);
 	void visit(SpaceNode node);
 	void visit(HorizontalTabNode node);
@@ -82,6 +86,8 @@ public interface ParseNodeVisitor {
 		public void visitLeave(ParseNode node) {
 			defaultVisitLeave(node);
 		}
+		public void visitEnter(ExpressionListNode node) { defaultVisitEnter(node); }
+		public void visitLeave(ExpressionListNode node) { defaultVisitLeave(node); }
 		public void visitEnter(PrintStatementNode node) {
 			defaultVisitEnter(node);
 		}
@@ -111,6 +117,7 @@ public interface ParseNodeVisitor {
 		public void visit(FloatingConstantNode node) { defaultVisitForLeaf(node);}
 		public void visit(CharacterConstantNode node) { defaultVisitForLeaf(node); }
 		public void visit(StringConstantNode node) { defaultVisitForLeaf(node); }
+		public void visit(ArrayIndexNode node) { defaultVisit(node); }
 		public void visit(NewlineNode node) {
 			defaultVisitForLeaf(node);
 		}	

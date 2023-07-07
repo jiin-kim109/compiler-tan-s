@@ -4,15 +4,15 @@ import java.util.Set;
 
 public class Array implements Type{
 
-    private Type subtype;
+    private Type subType;
 
-    public Array(TypeVariable type) {
-
+    public Array(Type subType) {
+        this.subType = subType;
     }
 
     @Override
     public int getSize() {
-        return 0;
+        return PrimitiveType.INTEGER.getSize();
     }
 
     @Override
@@ -22,16 +22,18 @@ public class Array implements Type{
 
     @Override
     public boolean equivalent(Type otherType) {
+        if (otherType.concreteType() instanceof Array) {
+            return getSubType().concreteType().equivalent(((Array) otherType.concreteType()).subType);
+        }
         return false;
     }
 
     @Override
-    public void addTypeVariables(Set<TypeVariable> typeVariables) {
-        // passes argument to subtype
+    public Type concreteType() {
+        return this;
     }
 
-    @Override
-    public Type concreteType() {
-        return null;
+    public Type getSubType() {
+        return subType;
     }
 }

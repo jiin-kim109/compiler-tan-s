@@ -37,11 +37,6 @@ public enum PrimitiveType implements Type {
 	}
 
 	@Override
-	public void addTypeVariables(Set<TypeVariable> typeVariables) {
-		return;
-	}
-
-	@Override
 	public Type concreteType() {
 		return this;
 	}

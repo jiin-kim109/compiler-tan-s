@@ -245,6 +245,31 @@ public class ASMCodeGenerator {
 
 		///////////////////////////////////////////////////////////////////////////
 		// expressions
+		public void visitLeave(ExpressionListNode node) {
+			newValueCode(node);
+			String address = Integer.toString(ExpressionListNode.addressCounter());
+
+			code.add(DLabel, address);
+			code.add(DataI, 5); // Type Identifier
+			if (node.getType() instanceof PrimitiveType) // Array Status
+				code.add(DataI, 0);
+			else
+				code.add(DataI, 4);
+			code.add(DataI, node.getType().getSize());
+
+			if (node.getListSize() >= 0) // Array Size
+				code.add(DataI, node.getListSize());
+			else {
+				ParseNode sizeNode = node.getSizeNode();
+				code.append(removeValueCode(sizeNode));
+			}
+
+			for (ParseNode element : node.getElements()) { // Array elements
+				code.append(removeValueCode(element));
+			}
+			code.add(PushD, address);
+		}
+
 		public void visitLeave(OperatorNode node) {
 			Lextant operator = node.getOperator();
 			PromotedSignature signature = node.getSignature();
@@ -283,61 +308,6 @@ public class ASMCodeGenerator {
 			return result;
 		}
 
-		private void visitComparisonOperatorNode(OperatorNode node,
-				Lextant operator) {
-
-			ASMCodeFragment arg1 = removeValueCode(node.child(0));
-			ASMCodeFragment arg2 = removeValueCode(node.child(1));
-			
-			Labeller labeller = new Labeller("compare");
-			
-			String startLabel = labeller.newLabel("arg1");
-			String arg2Label  = labeller.newLabel("arg2");
-			String subLabel   = labeller.newLabel("sub");
-			String trueLabel  = labeller.newLabel("true");
-			String falseLabel = labeller.newLabel("false");
-			String joinLabel  = labeller.newLabel("join");
-			
-			newValueCode(node);
-			code.add(Label, startLabel);
-			code.append(arg1);
-			code.add(Label, arg2Label);
-			code.append(arg2);
-			code.add(Label, subLabel);
-			code.add(Subtract);
-			
-			code.add(JumpPos, trueLabel);
-			code.add(Jump, falseLabel);
-
-			code.add(Label, trueLabel);
-			code.add(PushI, 1);
-			code.add(Jump, joinLabel);
-			code.add(Label, falseLabel);
-			code.add(PushI, 0);
-			code.add(Jump, joinLabel);
-			code.add(Label, joinLabel);
-
-		}		
-		private void visitUnaryOperatorNode(OperatorNode node) {
-			newValueCode(node);
-			ASMCodeFragment arg1 = removeValueCode(node.child(0));
-			
-			code.append(arg1);
-			
-			ASMOpcode opcode = opcodeForOperator(node.getOperator());
-			code.add(opcode);							// type-dependent! (opcode is different for floats and for ints)
-		}
-		private void visitNormalBinaryOperatorNode(OperatorNode node) {
-			newValueCode(node);
-			ASMCodeFragment arg1 = removeValueCode(node.child(0));
-			ASMCodeFragment arg2 = removeValueCode(node.child(1));
-			
-			code.append(arg1);
-			code.append(arg2);
-			
-			ASMOpcode opcode = opcodeForOperator(node.getOperator());
-			code.add(opcode);							// type-dependent! (opcode is different for floats and for ints)
-		}
 		private ASMOpcode opcodeForOperator(Lextant lextant) {
 			assert(lextant instanceof Punctuator);
 			Punctuator punctuator = (Punctuator)lextant;

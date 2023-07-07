@@ -17,7 +17,6 @@ public class FunctionSignature {
 	private Type resultType;
 	private Type[] paramTypes;
 	Object whichVariant;
-	private Set<TypeVariable> typeVariables;
 	
 	
 	///////////////////////////////////////////////////////////////
@@ -28,30 +27,6 @@ public class FunctionSignature {
 		storeParamTypes(types);
 		resultType = types[types.length-1];
 		this.whichVariant = whichVariant;
-		findTypeVariables();
-	}
-	private void findTypeVariables() {
-		typeVariables = new HashSet<TypeVariable>();
-		for (Type type : paramTypes) {
-			type.addTypeVariables(typeVariables);
-		}
-		resultType.addTypeVariables(typeVariables);
-	}
-
-	public List<Type> typeVariableSettings() {
-		List<Type> results = new ArrayList<Type>();
-		for (TypeVariable typeVariable : typeVariables) {
-			results.add(typeVariable.concreteType());
-		}
-		return results;
-	}
-
-	public void setTypeVariables(List<Type> typeVariableSettings) {
-		int i = 0;
-		for (TypeVariable typeVariable : typeVariables) {
-			typeVariable.setContraint(typeVariableSettings.get(i));
-			i += 1;
-		}
 	}
 
 	private void storeParamTypes(Type[] types) {
@@ -73,6 +48,10 @@ public class FunctionSignature {
 	public boolean isNull() {
 		return false;
 	}
+
+	public int numTypes() {
+		return paramTypes.length + 1; // # of param types + result type
+	}
 	
 	
 	///////////////////////////////////////////////////////////////
@@ -82,7 +61,6 @@ public class FunctionSignature {
 		if (types.size() != paramTypes.length) {
 			return false;
 		}
-		resetTypeVariables();
 
 		for (int i=0; i<paramTypes.length; i++) {
 			if (!assignableTo(paramTypes[i], types.get(i))) {
@@ -90,12 +68,6 @@ public class FunctionSignature {
 			}
 		}
 		return true;
-	}
-
-	private void resetTypeVariables() {
-		for (TypeVariable variable : typeVariables) {
-			variable.reset();
-		}
 	}
 
 	private boolean assignableTo(Type formalType, Type actualType) {
@@ -116,31 +88,5 @@ public class FunctionSignature {
 	};
 	public static FunctionSignature nullInstance() {
 		return neverMatchedSignature;
-	}
-	
-	///////////////////////////////////////////////////////////////////
-	// Signatures for tan-0 operators
-	// this section will probably disappear in tan-1 (in favor of FunctionSignatures)
-	
-	private static FunctionSignature addSignature = new FunctionSignature(1, PrimitiveType.INTEGER, PrimitiveType.INTEGER, PrimitiveType.INTEGER);
-	private static FunctionSignature subtractSignature = new FunctionSignature(1, PrimitiveType.INTEGER, PrimitiveType.INTEGER);
-	private static FunctionSignature multiplySignature = new FunctionSignature(1, PrimitiveType.INTEGER, PrimitiveType.INTEGER, PrimitiveType.INTEGER);
-	private static FunctionSignature greaterSignature = new FunctionSignature(1, PrimitiveType.INTEGER, PrimitiveType.INTEGER, PrimitiveType.BOOLEAN);
-
-	
-	// the switch here is ugly compared to polymorphism.  This should perhaps be a method on Lextant.
-	public static FunctionSignature signatureOf(Lextant lextant) {
-		assert(lextant instanceof Punctuator);	
-		Punctuator punctuator = (Punctuator)lextant;
-		
-		switch(punctuator) {
-		case ADD:		return addSignature;
-		case SUBTRACT:  return subtractSignature;
-		case MULTIPLY:	return multiplySignature;
-		case GREATER:	return greaterSignature;
-
-		default:
-			return neverMatchedSignature;
-		}
 	}
 }
