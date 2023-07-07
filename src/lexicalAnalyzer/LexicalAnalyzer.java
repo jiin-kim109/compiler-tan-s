@@ -49,7 +49,6 @@ public class LexicalAnalyzer extends ScannerImp implements Scanner {
 								)
 						)
 				)));
-
 		Token nextToken = token.orElseGet(() -> {
 			lexicalError(ch);
 			return findNextToken();

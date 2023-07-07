@@ -11,8 +11,6 @@ import java.util.stream.IntStream;
 public class PromotedSignature {
     FunctionSignature signature;
     List<Promotion> promotions;
-    List<Type> concreteParamTypes;
-    List<Type> concreteResultType;
 
     public PromotedSignature(FunctionSignature signature, List<Promotion> promotions) {
         this.signature = signature;
@@ -50,7 +48,7 @@ public class PromotedSignature {
         return signature.getVariant();
     }
     public int numPromotions() {
-        return promotions.stream().filter(promotion -> !promotion.isNull()).toList().size();
+        return promotions.stream().filter(promotion -> !promotion.isNull()).collect(Collectors.toList()).size();
     }
     public Promotion promotion(int i) {
         return promotions.get(i);

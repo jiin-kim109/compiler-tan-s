@@ -104,8 +104,6 @@ public class FunctionSignatures extends ArrayList<FunctionSignature> {
 
 		new FunctionSignatures(Punctuator.DIVIDE, Promotable.PROMOTABLE,
 				new FunctionSignature(new IntegerDivideCodeGenerator(), INTEGER, INTEGER, INTEGER),
-				new FunctionSignature(new FloatingDivideCodeGenerator(), INTEGER, FLOATING, FLOATING),
-				new FunctionSignature(new FloatingDivideCodeGenerator(), FLOATING, INTEGER, FLOATING),
 				new FunctionSignature(new FloatingDivideCodeGenerator(), FLOATING, FLOATING, FLOATING)
 		);
 

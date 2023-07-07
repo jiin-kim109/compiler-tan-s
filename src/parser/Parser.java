@@ -196,7 +196,6 @@ public class Parser {
 		}
 		Token declarationToken = nowReading;
 		readToken();
-
 		ParseNode identifier = parseIdentifier();
 		expect(Punctuator.ASSIGN);
 		ParseNode initializer = parseExpression();
@@ -275,7 +274,6 @@ public class Parser {
 		if(!startsAdditiveExpression(nowReading)) {
 			return syntaxErrorNode("additiveExpression");
 		}
-
 		ParseNode left = parseMultiplicativeExpression();
 		while(nowReading.isLextant(Punctuator.ADD, Punctuator.SUBTRACT)) {
 			Token additiveToken = nowReading;

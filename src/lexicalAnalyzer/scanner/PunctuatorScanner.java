@@ -52,13 +52,12 @@ public class PunctuatorScanner extends TokenScanner {
 		if(punctuators.size() == 1 && scanned.isPunctuator()) {
 			return scanned.asToken();
 		}
-		
 		if(punctuators.isEmpty() || !input.hasNext()) {
 			backupToLastPunctuatorPrefix();
 			return scanned.asToken();
 		}
-
-		scanned.add(input.next());
+		LocatedChar c = input.next();
+		scanned.add(c);
 		return scanPunctuator();
 	}
 
