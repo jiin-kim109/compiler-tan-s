@@ -25,6 +25,7 @@ public class RunTime {
 	public static final String FLOATING_DIVIDE_BY_ZERO_RUNTIME_ERROR = "$$f-divide-by-zero";
 	public static final String BAD_COMPARISON_OPERAND_RUNTIME_ERROR = "$$bad-comparison-operand";
 	public static final String BAD_TYPECAST_OPERAND_RUNTIME_ERROR = "$$bad-typecast-operand";
+	public static final String INDEX_OUT_OF_BOUND_ERROR = "$$index-out-of-bound";
 
 	private ASMCodeFragment environmentASM() {
 		ASMCodeFragment result = new ASMCodeFragment(GENERATES_VOID);
@@ -78,6 +79,7 @@ public class RunTime {
 		floatingDivideByZeroError(frag);
 		badOperandError(frag);
 		badTypecastError(frag);
+		indexOutOfBoundError(frag);
 		
 		return frag;
 	}
@@ -135,7 +137,17 @@ public class RunTime {
 		frag.add(Label, BAD_TYPECAST_OPERAND_RUNTIME_ERROR);
 		frag.add(PushD, badTypecastOperandMessage);
 		frag.add(Jump, GENERAL_RUNTIME_ERROR);
+	}
 
+	private void indexOutOfBoundError(ASMCodeFragment frag) {
+		String indexOutOfBoundErrorMessage = "$errors-index-out-of-bound";
+
+		frag.add(DLabel, indexOutOfBoundErrorMessage);
+		frag.add(DataS, "index out of bound");
+
+		frag.add(Label, INDEX_OUT_OF_BOUND_ERROR);
+		frag.add(PushD, indexOutOfBoundErrorMessage);
+		frag.add(Jump, GENERAL_RUNTIME_ERROR);
 	}
 	
 	

@@ -4,10 +4,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.IntStream;
 
 import asmCodeGenerator.codeStorage.ASMCodeFragment;
 import asmCodeGenerator.codeStorage.ASMOpcode;
 import asmCodeGenerator.operators.SimpleCodeGenerator;
+import asmCodeGenerator.runtime.MemoryManager;
 import asmCodeGenerator.runtime.RunTime;
 import lexicalAnalyzer.Lextant;
 import lexicalAnalyzer.Punctuator;
@@ -37,11 +39,12 @@ public class ASMCodeGenerator {
 	
 	public ASMCodeFragment makeASM() {
 		ASMCodeFragment code = new ASMCodeFragment(GENERATES_VOID);
-		
+
+		code.append( MemoryManager.codeForInitialization() );
 		code.append( RunTime.getEnvironment() );
 		code.append( globalVariableBlockASM() );
 		code.append( programASM() );
-//		code.append( MemoryManager.codeForAfterApplication() );
+		code.append( MemoryManager.codeForAfterApplication() );
 		
 		return code;
 	}
@@ -105,32 +108,23 @@ public class ASMCodeGenerator {
 	    public  ASMCodeFragment removeRootCode(ParseNode tree) {
 			return getAndRemoveCode(tree);
 		}		
-		ASMCodeFragment removeValueCode(ParseNode node) {
+		public ASMCodeFragment removeValueCode(ParseNode node) {
 			ASMCodeFragment frag = getAndRemoveCode(node);
 			makeFragmentValueCode(frag, node);
 			return frag;
 		}		
-		private ASMCodeFragment removeAddressCode(ParseNode node) {
+		public ASMCodeFragment removeAddressCode(ParseNode node) {
 			ASMCodeFragment frag = getAndRemoveCode(node);
 			assert frag.isAddress();
 			return frag;
 		}		
-		ASMCodeFragment removeVoidCode(ParseNode node) {
+		public ASMCodeFragment removeVoidCode(ParseNode node) {
 			ASMCodeFragment frag = getAndRemoveCode(node);
 			assert frag.isVoid();
 			return frag;
 		}
-		
-	    ////////////////////////////////////////////////////////////////////
-        // convert code to value-generating code.
-		private void makeFragmentValueCode(ASMCodeFragment code, ParseNode node) {
-			assert !code.isVoid();
-			
-			if(code.isAddress()) {
-				turnAddressIntoValue(code, node);
-			}	
-		}
-		private void turnAddressIntoValue(ASMCodeFragment code, ParseNode node) {
+
+		public void turnAddressIntoValue(ASMCodeFragment code, ParseNode node) {
 			if(node.getType() == PrimitiveType.INTEGER) {
 				code.add(LoadI);
 			}
@@ -146,10 +140,45 @@ public class ASMCodeGenerator {
 			else if(node.getType() == PrimitiveType.STRING) {
 				code.add(LoadI);
 			}
+			else if(node.getType() instanceof Array) {
+				code.add(LoadI);
+			}
 			else {
 				assert false : "node " + node;
 			}
 			code.markAsValue();
+		}
+
+		public ASMOpcode opcodeForAddress(Type type) {
+			if(type == PrimitiveType.INTEGER) {
+				return LoadI;
+			}
+			else if(type == PrimitiveType.FLOATING) {
+				return LoadF;
+			}
+			else if(type == PrimitiveType.BOOLEAN) {
+				return LoadC;
+			}
+			else if(type == PrimitiveType.CHARACTER) {
+				return LoadC;
+			}
+			else if(type == PrimitiveType.STRING) {
+				return LoadI;
+			}
+			else {
+				assert false : "type " + type;
+			}
+			return null;
+		}
+		
+	    ////////////////////////////////////////////////////////////////////
+        // convert code to value-generating code.
+		private void makeFragmentValueCode(ASMCodeFragment code, ParseNode node) {
+			assert !code.isVoid();
+			
+			if(code.isAddress()) {
+				turnAddressIntoValue(code, node);
+			}	
 		}
 		
 	    ////////////////////////////////////////////////////////////////////
@@ -204,7 +233,7 @@ public class ASMCodeGenerator {
 			newVoidCode(node);
 			ASMCodeFragment lvalue = removeAddressCode(node.child(0));	
 			ASMCodeFragment rvalue = removeValueCode(node.child(1));
-			
+
 			code.append(lvalue);
 			code.append(rvalue);
 			
@@ -250,28 +279,113 @@ public class ASMCodeGenerator {
 		///////////////////////////////////////////////////////////////////////////
 		// expressions
 		public void visitLeave(ExpressionListNode node) {
+			code.add(PushI, 12);
+			code.add(PushI, 0);
+			code.add(StoreI);
+
 			newValueCode(node);
-			String address = Integer.toString(ExpressionListNode.addressCounter());
+			assert node.getType() instanceof Array;
+			Type arraySubType = ((Array) node.getType()).getSubType();
 
-			code.add(DLabel, address);
-			code.add(DataI, 5); // Type Identifier
-			if (node.getType() instanceof PrimitiveType) // Array Status
-				code.add(DataI, 0);
-			else
-				code.add(DataI, 4);
-			code.add(DataI, node.getType().getSize());
-
-			if (node.getListSize() >= 0) // Array Size
-				code.add(DataI, node.getListSize());
+			code.add(PushI, 16); // 4 * 4 header blocks
+			String arrayLengthLabel = "arrayLength" + ExpressionListNode.addressCounter();
+			code.add(DLabel, arrayLengthLabel);
+			code.add(DataZ, 4);
+			if (node.getListSize() >= 0) { // Array length
+				code.add(PushI, node.getListSize());
+				code.add(Duplicate);
+				code.add(PushD, arrayLengthLabel);
+				code.add(Exchange);
+				code.add(StoreI);
+				code.add(PushI, arraySubType.getSize());
+				code.add(Multiply);
+			}
 			else {
-				ParseNode sizeNode = node.getSizeNode();
-				code.append(removeValueCode(sizeNode));
+				code.append(removeValueCode(node.getSizeNode()));
+				code.add(Duplicate);
+				code.add(PushD, arrayLengthLabel);
+				code.add(Exchange);
+				code.add(StoreI);
+				code.add(PushI, arraySubType.getSize());
+				code.add(Multiply);
+			}
+			code.add(Add);
+			code.add(Call, MemoryManager.MEM_MANAGER_ALLOCATE);
+			String arrayAddressLabel = "arrayAddressLabel" + ExpressionListNode.addressCounter();
+			code.add(DLabel, arrayAddressLabel);
+			code.add(DataZ, 4);
+			code.add(Duplicate);
+			code.add(PushD, arrayAddressLabel);
+			code.add(Exchange);
+			code.add(StoreI);
+
+			code.add(Duplicate); // [header1]: Type Identifier
+			code.add(PushI, 0);
+			code.add(Add);
+			code.add(PushI, 5);
+			code.add(StoreI);
+
+			code.add(Duplicate); // [header2]: Array Status
+			code.add(PushI, 4);
+			code.add(Add);
+			if (arraySubType instanceof PrimitiveType && arraySubType != PrimitiveType.STRING) {
+				code.add(PushI, 0);
+				code.add(StoreI);
+			}
+			else {
+				code.add(PushI, 2);
+				code.add(StoreI);
 			}
 
+			code.add(Duplicate); // [header3]: Subtype Size
+			code.add(PushI, 8);
+			code.add(Add);
+			code.add(PushI, arraySubType.getSize());
+			code.add(StoreI); // Subtype Size
+
+			code.add(Duplicate); // [header4]: Array length
+			code.add(PushI, 12);
+			code.add(Add);
+			code.add(PushD, arrayLengthLabel);
+			code.add(LoadI);
+			code.add(StoreI);
+
+			code.add(PushD, arrayLengthLabel); // set default values
+			code.add(LoadI);
+			Labeller labeller = new Labeller("arrayDefaultValue" + ExpressionListNode.addressCounter());
+			String defaultValueLoopStart  = labeller.newLabel("loopStart");
+			String defaultValueLoopEnd  = labeller.newLabel("loopEnd");
+			code.add(Label, defaultValueLoopStart);
+			code.add(Duplicate);
+			code.add(JumpFalse, defaultValueLoopEnd);
+			code.add(PushI, 1);
+			code.add(Subtract);
+			code.add(Duplicate);
+			code.add(PushI, arraySubType.getSize());
+			code.add(Multiply);
+			code.add(PushI, 16);
+			code.add(Add);
+			code.add(PushD, arrayAddressLabel);
+			code.add(LoadI);
+			code.add(Add);
+			code.add(PushI, 0);
+			code.add(StoreI);
+			code.add(Jump, defaultValueLoopStart);
+			code.add(Label, defaultValueLoopEnd);
+			code.add(Pop);
+
+			int index = 0;
 			for (ParseNode element : node.getElements()) { // Array elements
+				code.add(Duplicate); // [Element]
+				code.add(PushI, 16 + index * arraySubType.getSize());
+				code.add(Add);
 				code.append(removeValueCode(element));
+				if (node.numPromotions() > index) {
+					code.append(node.promotion(index).codeFor());
+				}
+				code.add(opcodeForStore(arraySubType));
+				index += 1;
 			}
-			code.add(PushD, address);
 		}
 
 		public void visitLeave(OperatorNode node) {
@@ -310,6 +424,49 @@ public class ASMCodeGenerator {
 				result.add(code);
 			}
 			return result;
+		}
+
+		public void visitLeave(ArrayIndexNode node) {
+			newAddressCode(node);
+
+			ParseNode identifier = node.identifier();
+			ParseNode index = node.index();
+
+			ASMCodeFragment arrayAddress = removeValueCode(identifier); // value of identifier = array address
+			ASMCodeFragment indexValue = removeValueCode(index);
+
+			String indexLabel = "arrayIndex" + ArrayIndexNode.addressCounter();
+			code.add(DLabel, indexLabel);
+			code.add(DataZ, 4);
+			code.add(PushD, indexLabel);
+			code.append(indexValue); // [addr, length, index]
+			code.add(StoreI);
+
+			code.append(arrayAddress);
+			code.add(Duplicate); // [addr, addr]
+			code.add(PushI, 12);
+			code.add(Add);
+			code.add(LoadI); // [addr, length]
+			code.add(PushD, indexLabel);
+			code.add(LoadI); // [addr, length, index]
+			code.add(Duplicate);
+			code.add(JumpNeg, RunTime.INDEX_OUT_OF_BOUND_ERROR);
+			code.add(Subtract);
+			code.add(Duplicate);
+			code.add(JumpNeg, RunTime.INDEX_OUT_OF_BOUND_ERROR);
+			code.add(JumpFalse, RunTime.INDEX_OUT_OF_BOUND_ERROR);
+			code.add(Duplicate);
+
+			code.add(PushI, 8);
+			code.add(Add);
+			code.add(LoadI); // [addr, typeSize]
+
+			code.add(PushD, indexLabel);
+			code.add(LoadI); // [addr, typeSize, index]
+			code.add(Multiply); // [addr, index*typeSize]
+			code.add(Add); // [addr + index*typeSize]
+			code.add(PushI, 16); // [addr + 16 + index*typeSize]
+			code.add(Add);
 		}
 
 		private ASMOpcode opcodeForOperator(Lextant lextant) {
@@ -351,7 +508,7 @@ public class ASMCodeGenerator {
 
 		public void visit(StringConstantNode node) {
 			newValueCode(node);
-			String address = Integer.toString(StringConstantNode.addressCounter());
+			String address = StringConstantNode.addressCounter();
 
 			code.add(DLabel, address);
 			code.add(DataI, 3);

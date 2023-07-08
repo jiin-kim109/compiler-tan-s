@@ -9,10 +9,13 @@ public class CommentSkipper extends TokenScanner {
 
     private PushbackCharStream input;
 
-    public static void skipComment(LocatedChar startingCharacter, PushbackCharStream input) {
+    public static boolean skipComment(LocatedChar startingCharacter, PushbackCharStream input) {
         CommentSkipper scanner = new CommentSkipper(input);
-        if (scanner.isCommentSymbol(startingCharacter))
+        if (scanner.isCommentSymbol(startingCharacter)) {
             scanner.skipComment(input);
+            return true;
+        }
+        return false;
     }
 
     public boolean isCommentSymbol(LocatedChar lc) {

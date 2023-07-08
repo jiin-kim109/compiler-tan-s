@@ -32,7 +32,8 @@ public class LexicalAnalyzer extends ScannerImp implements Scanner {
 	@Override
 	protected Token findNextToken() {
 		LocatedChar ch = input.nextNonWhitespaceChar();
-		CommentSkipper.skipComment(ch, input);
+		if (CommentSkipper.skipComment(ch, input))
+			return findNextToken();
 		if (LocatedCharStream.isEndOfInput(input.peek()))
 			return NullToken.make(input.next());
 

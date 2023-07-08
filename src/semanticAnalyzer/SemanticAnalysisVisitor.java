@@ -74,7 +74,6 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 
 		Type declarationType = initializer.getType();
 		node.setType(declarationType);
-		identifier.setType(declarationType);
 
 		Constancy constancy = (node.getToken().isLextant(Keyword.CONST)) ?
 				Constancy.IS_CONSTANT :
@@ -96,8 +95,7 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		Type expressionType = expression.getType();
 		Type identifierType = identifier.getType();
 
-		// Implement equivalent instead for milestone 2
-		if (!expressionType.equals(identifierType)) {
+		if (!expressionType.equivalent(identifierType)) {
 			semanticError("types don't match in assignment statement");
 			return;
 		}
@@ -137,6 +135,13 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		}
 	}
 
+	@Override
+	public void visitLeave(ArrayIndexNode node) {
+		ParseNode identifier = node.identifier();
+		assert identifier.getType() instanceof Array;
+		node.setType(((Array) identifier.getType()).getSubType());
+	}
+
 	private PromotedSignature selectPromotedSignature(OperatorNode node, List<Type> childTypes) {
 		final int MAX_NUM_PROMOTION = 2;
 		FunctionSignatures signatures = FunctionSignatures.signaturesOf(node.getOperator());
@@ -160,13 +165,6 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 	}
 
 	@Override
-	public void visitLeave(ArrayIndexNode node) {
-		ParseNode identifier = node.identifier();
-		assert identifier.getType() instanceof Array;
-		node.setType(((Array) identifier.getType()).getSubType());
-	}
-
-	@Override
 	public void visitLeave(ExpressionListNode node) {
 		if (node.hasDefinedType()) { // has type defined
 			ParseNode type = node.getTypeNode();
@@ -183,9 +181,12 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 					typeCheckError(node, node.childTypes());
 					return;
 				}
-				node.setType(node.first().getType());
+				node.setType(new Array(node.first().getType()));
 			}
-			else { // promote primitive to the nearest
+			else if (node.checkChildrenHaveTheSameType()) { // children have the same type, no promotion needed
+				node.setType(new Array(node.first().getType()));
+			}
+			else { // promote to the nearest primitive
 				node.promoteTo(Promotion.CHAR_TO_INT);
 				node.setType(new Array(PrimitiveType.INTEGER));
 				if (!node.checkChildrenHaveTheSameType()) {

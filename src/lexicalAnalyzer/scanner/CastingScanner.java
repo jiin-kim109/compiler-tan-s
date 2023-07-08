@@ -41,7 +41,7 @@ public class CastingScanner extends TokenScanner {
         buffer.append(startingCharacter.getCharacter());
         buffer.append(next.getCharacter());
         backupPrefix.push(next);
-        while (next.isLowerCase()) {
+        while (next.isLowerCase() || next.isChar('[') || next.isChar(']')) {
             next = input.nextNonWhitespaceChar();
             backupPrefix.push(next);
             buffer.append(next.getCharacter());

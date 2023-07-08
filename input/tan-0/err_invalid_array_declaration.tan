@@ -1,0 +1,4 @@
+main {
+    const a := [3, new [int](3)];
+    print a \n;
+}

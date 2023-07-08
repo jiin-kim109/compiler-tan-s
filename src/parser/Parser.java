@@ -366,8 +366,7 @@ public class Parser {
 				readToken();
 				ParseNode indexExpression = parseExpression();
 				expect(Punctuator.CLOSE_SQUARE);
-				//return ArrayIndexNode.make(indexToken, expression, indexExpression);
-				return OperatorNode.withChildren(indexToken, expression, indexExpression);
+				return ArrayIndexNode.make(indexToken, expression, indexExpression);
 			}
 			else { // array expression list
 				List<ParseNode> listElements = new ArrayList<>();
@@ -375,7 +374,6 @@ public class Parser {
 				while (nowReading.isLextant(Punctuator.LIST_DELIMITER)) {
 					readToken();
 					listElements.add(parseExpression());
-					readToken();
 				}
 				expect(Punctuator.CLOSE_SQUARE);
 				return ExpressionListNode.withElements(listOpenToken, listElements);
@@ -397,7 +395,11 @@ public class Parser {
 		if (nowReading.isLextant(Punctuator.TYPE_CAST)) {
 			Token typeToken = nowReading;
 			readToken();
-			ParseNode typeNode = parseTypeLiteral();
+			ParseNode typeNode;
+			if (nowReading.isLextant(Punctuator.OPEN_SQUARE))
+				typeNode = parseArrayExpression();
+			else
+				typeNode = parseTypeLiteral();
 			assert (typeNode instanceof TypeNode);
 			expect(Punctuator.GREATER);
 			if (!startsParenthesisExpression(nowReading)) {
@@ -406,7 +408,6 @@ public class Parser {
 			ParseNode parenthesizedExpression = parseParenthesisExpression();
 			return OperatorNode.withChildren(typeToken, typeNode, parenthesizedExpression);
 		}
-
 		return parseParenthesisExpression();
 	}
 

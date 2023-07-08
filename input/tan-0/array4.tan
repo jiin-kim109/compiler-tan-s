@@ -1,0 +1,11 @@
+main {
+	const a := new [bool](3);
+	[a:0] := true;
+	[a:1] := true;
+	print a \n;
+	var b := new [char](2);
+	print b \n;
+	var c := new [string](3);
+	[c:0] := "yes";
+	print c \n;
+}

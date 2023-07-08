@@ -1,7 +1,0 @@
-main {
-    var t := <float>(3);
-	const a := new [int](2);
-	[a:0] := 1;
-	[a:1] := 2;
-	print a \n;
-}

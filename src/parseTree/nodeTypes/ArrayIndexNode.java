@@ -6,6 +6,10 @@ import tokens.StringLiteralToken;
 import tokens.Token;
 
 public class ArrayIndexNode extends ParseNode {
+
+	private static int addressCounter = 0;
+
+	public static String addressCounter() { return "arrayIndex" + addressCounter++; }
 	public ArrayIndexNode(Token token) {
 		super(token);
 	}

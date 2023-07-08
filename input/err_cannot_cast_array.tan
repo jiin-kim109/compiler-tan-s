@@ -1,5 +1,5 @@
 main {
-    var a := [3,4]
-	const t := <[float]>a;
+    var a := [3,4];
+	const t := <[float]>(a);
 	print t \n;
 }

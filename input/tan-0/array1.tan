@@ -1,0 +1,10 @@
+main {
+    var t := <float>(3);
+	const a := new [int](4);
+	[a:0] := 1;
+	[a:1] := 2;
+	[a:2] := -2;
+	[a:3] := 8;
+	print a \n;
+	print [1, 2, 3, 4] \n;
+}

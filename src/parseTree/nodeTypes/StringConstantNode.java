@@ -17,8 +17,8 @@ public class StringConstantNode extends ParseNode {
 		super(node);
 	}
 
-	public static int addressCounter() {
-		return addressCounter++;
+	public static String addressCounter() {
+		return "string" + Integer.toString(addressCounter++);
 	}
 
 ////////////////////////////////////////////////////////////

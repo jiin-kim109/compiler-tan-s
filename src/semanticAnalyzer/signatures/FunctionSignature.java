@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import semanticAnalyzer.types.Array;
 import semanticAnalyzer.types.PrimitiveType;
 import semanticAnalyzer.types.Type;
 import lexicalAnalyzer.Lextant;
@@ -74,7 +75,10 @@ public class FunctionSignature {
 		if(actualType == PrimitiveType.ERROR && ALL_TYPES_ACCEPT_ERROR_TYPES) {
 			return true;
 		}
-		return formalType.equals(actualType);
+		else if (actualType instanceof Array && formalType instanceof Array) {
+			return true;
+		}
+		return formalType.equivalent(actualType);
 	}
 	
 	// Null object pattern

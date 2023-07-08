@@ -5,6 +5,7 @@ import parseTree.ParseNodeVisitor;
 import semanticAnalyzer.signatures.Promotion;
 import semanticAnalyzer.types.PrimitiveType;
 import semanticAnalyzer.types.Type;
+import tokens.IntegerLiteralToken;
 import tokens.LextantToken;
 import tokens.Token;
 
@@ -12,13 +13,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ExpressionListNode extends ParseNode {
-	private List<Promotion> promotions;
+	private List<Promotion> promotions = new ArrayList<>();
 	private int listSize = -1;
 
 	private static int addressCounter = 0;
 
-	public static int addressCounter() {
-		return addressCounter++;
+	public static String addressCounter() {
+		return "expressionList" + Integer.toString(addressCounter++);
 	}
 	public ExpressionListNode(Token token) {
 		super(token);
@@ -46,8 +47,8 @@ public class ExpressionListNode extends ParseNode {
 	}
 
 	public boolean hasDefinedType() {
-		ParseNode type = child(0);
-		return type != null;
+		ParseNode type = getTypeNode();
+		return type != null && type instanceof TypeNode;
 	}
 
 	public boolean containNonPrimitive() {
@@ -71,7 +72,7 @@ public class ExpressionListNode extends ParseNode {
 	public List<ParseNode> getElements() {
 		if (getChildren().size() < 3)
 			return new ArrayList<>();
-		return getChildren().subList(2, getChildren().size()-1);
+		return getChildren().subList(2, getChildren().size());
 	}
 
 	public List<Type> childTypes() {
@@ -80,6 +81,14 @@ public class ExpressionListNode extends ParseNode {
 			types.add(child(i).getType());
 		}
 		return types;
+	}
+
+	public Promotion promotion(int index) {
+		return this.promotions.get(index);
+	}
+
+	public int numPromotions() {
+		return this.promotions.size();
 	}
 
 	public void promoteTo(Promotion promotion) {
@@ -97,12 +106,12 @@ public class ExpressionListNode extends ParseNode {
 	}
 
 	public boolean checkChildrenHaveTheSameType() {
-		Type prevType = child(2).getType();
+		Type matchType = first().getType();
 		for (int i=2; i<getChildren().size(); i++) {
-			if (!prevType.equivalent(child(i).getType()))
+			if (!matchType.equivalent(child(i).getType()))
 				return false;
 			else
-				prevType = child(i).getType();
+				matchType = child(i).getType();
 		}
 		return true;
 	}
@@ -112,8 +121,8 @@ public class ExpressionListNode extends ParseNode {
 
 	public static ParseNode withElements(Token token, List<ParseNode> children) {
 		ExpressionListNode node = new ExpressionListNode(token);
-		node.appendChild(null); // type
-		node.appendChild(null); // size
+		node.appendChild(new ErrorNode(token)); // type
+		node.appendChild(new ErrorNode(token)); // size
 		for(ParseNode child: children) {
 			node.appendChild(child);
 		}
