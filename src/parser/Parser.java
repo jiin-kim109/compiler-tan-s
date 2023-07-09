@@ -241,9 +241,27 @@ public class Parser {
 		if(!startsExpression(nowReading)) {
 			return syntaxErrorNode("expression");
 		}
-		return parseComparisonExpression();
+		return parseAndOrExpression();
 	}
 	private boolean startsExpression(Token token) {
+		return startsAndOrExpression(token);
+	}
+
+	private ParseNode parseAndOrExpression() {
+		if (!startsAndOrExpression(nowReading)) {
+			return syntaxErrorNode("andOr");
+		}
+
+		ParseNode leftCondition = parseComparisonExpression();
+		if (nowReading.isLextant(Punctuator.AND, Punctuator.OR)) {
+			Token andOrToken = nowReading;
+			readToken();
+			ParseNode rightCondition = parseComparisonExpression();
+			return OperatorNode.withChildren(andOrToken, leftCondition, rightCondition);
+		}
+		return leftCondition;
+	}
+	private boolean startsAndOrExpression(Token token) {
 		return startsComparisonExpression(token);
 	}
 
@@ -257,10 +275,9 @@ public class Parser {
 		if (nowReading.isLextant(Punctuator.GREATER, Punctuator.GREATER_OR_EQUAL, Punctuator.SMALLER, Punctuator.SMALLER_OR_EQUAL, Punctuator.EQUAL, Punctuator.NOT_EQUAL)) {
 			Token comparisonToken = nowReading;
 			readToken();
-			ParseNode right = parseExpression();
+			ParseNode right = parseAdditiveExpression();
 			return OperatorNode.withChildren(comparisonToken, left, right);
 		}
-
 		return left;
 
 	}
@@ -326,7 +343,7 @@ public class Parser {
 			return syntaxErrorNode("unary expression");
 		}
 
-		if (nowReading.isLextant(Punctuator.SUBTRACT, Punctuator.ADD)) {
+		if (nowReading.isLextant(Punctuator.SUBTRACT, Punctuator.ADD, Punctuator.NOT)) {
 			Token operatorToken = nowReading;
 			readToken();
 			ParseNode child = parseAtomicExpression();
@@ -335,7 +352,7 @@ public class Parser {
 		return parseArrayExpression();
 	}
 	private boolean startsUnaryExpression(Token token) {
-		return token.isLextant(Punctuator.SUBTRACT, Punctuator.ADD) || startsArrayExpression(token);
+		return token.isLextant(Punctuator.SUBTRACT, Punctuator.ADD, Punctuator.NOT) || startsArrayExpression(token);
 	}
 
 	// arrayExpression -> [ expressionList -> expression (,expression)* ] | CE
@@ -355,29 +372,28 @@ public class Parser {
 		if (nowReading.isLextant(Punctuator.OPEN_SQUARE)) {
 			Token listOpenToken = nowReading;
 			readToken();
-			ParseNode expression = parseExpression();
-			if (expression instanceof TypeNode) { // array type
+			ParseNode firstExprInList = parseExpression();
+			if (firstExprInList instanceof TypeNode) { // array type
 				expect(Punctuator.CLOSE_SQUARE);
-				return TypeNode.arrayOf(expression.getToken(), (TypeNode) expression);
+				return TypeNode.arrayOf(firstExprInList.getToken(), (TypeNode) firstExprInList);
 			}
-			else if (expression instanceof IdentifierNode) { // array indexing
-				assert nowReading.isLextant(Punctuator.INDEXING);
+
+			List<ParseNode> listElements = new ArrayList<>();
+			listElements.add(firstExprInList);
+			if (nowReading.isLextant(Punctuator.INDEXING)) {
+				assert firstExprInList instanceof IdentifierNode || firstExprInList instanceof ArrayIndexNode;
 				Token indexToken = nowReading;
 				readToken();
 				ParseNode indexExpression = parseExpression();
 				expect(Punctuator.CLOSE_SQUARE);
-				return ArrayIndexNode.make(indexToken, expression, indexExpression);
+				return ArrayIndexNode.make(indexToken, firstExprInList, indexExpression);
 			}
-			else { // array expression list
-				List<ParseNode> listElements = new ArrayList<>();
-				listElements.add(expression);
-				while (nowReading.isLextant(Punctuator.LIST_DELIMITER)) {
-					readToken();
-					listElements.add(parseExpression());
-				}
-				expect(Punctuator.CLOSE_SQUARE);
-				return ExpressionListNode.withElements(listOpenToken, listElements);
+			while (nowReading.isLextant(Punctuator.LIST_DELIMITER)) { // expression list
+				readToken();
+				listElements.add(parseExpression());
 			}
+			expect(Punctuator.CLOSE_SQUARE);
+			return ExpressionListNode.withElements(listOpenToken, listElements);
 		}
 		return parseCastingExpression();
 	}

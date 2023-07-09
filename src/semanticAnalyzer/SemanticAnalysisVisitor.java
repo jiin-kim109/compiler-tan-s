@@ -5,17 +5,21 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.IntStream;
 
+import asmCodeGenerator.operators.TypeCastCodeGenerator;
 import lexicalAnalyzer.Keyword;
+import lexicalAnalyzer.Punctuator;
 import logging.TanLogger;
 import parseTree.ParseNode;
 import parseTree.ParseNodeVisitor;
 import parseTree.nodeTypes.*;
+import semanticAnalyzer.signatures.FunctionSignature;
 import semanticAnalyzer.signatures.FunctionSignatures;
 import semanticAnalyzer.signatures.PromotedSignature;
 import semanticAnalyzer.signatures.Promotion;
 import semanticAnalyzer.types.Array;
 import semanticAnalyzer.types.PrimitiveType;
 import semanticAnalyzer.types.Type;
+import semanticAnalyzer.types.TypeVariable;
 import symbolTable.Binding;
 import symbolTable.Binding.Constancy;
 import symbolTable.Scope;
@@ -123,11 +127,28 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 			childTypes = Arrays.asList(left.getType(), right.getType());
 		}
 
+		if (node.getOperator() == Punctuator.TYPE_CAST && // instable code
+				node.child(0).getType() instanceof Array) {
+			if (node.child(0).getType().equivalent(node.child(1).getType())) {
+				node.setType(node.child(0).getType());
+				TypeVariable T = new TypeVariable("T");
+				node.setSignature(new PromotedSignature(new FunctionSignature(new TypeCastCodeGenerator(), new Array(T), new Array(T), new Array(T)), new ArrayList<>()));
+				FunctionSignatures.resetTypeVariables();
+				return;
+			}
+			else {
+				typeCheckError(node, childTypes);
+				node.setType(PrimitiveType.ERROR);
+				return;
+			}
+		}
+
 		PromotedSignature signature = selectPromotedSignature(node, childTypes);
 
 		if(signature.accepts(childTypes)) {
 			node.setType(signature.resultType().concreteType());
 			node.setSignature(signature);
+			FunctionSignatures.resetTypeVariables();
 		}
 		else {
 			typeCheckError(node, childTypes);
@@ -240,7 +261,6 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 	public void visit(IdentifierNode node) {
 		if(!isBeingDeclared(node)) {		
 			Binding binding = node.findVariableBinding();
-			
 			node.setType(binding.getType());
 			node.setBinding(binding);
 		}

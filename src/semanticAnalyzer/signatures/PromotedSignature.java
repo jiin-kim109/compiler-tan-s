@@ -1,5 +1,6 @@
 package semanticAnalyzer.signatures;
 
+import semanticAnalyzer.types.Array;
 import semanticAnalyzer.types.PrimitiveType;
 import semanticAnalyzer.types.Type;
 
@@ -35,14 +36,19 @@ public class PromotedSignature {
         return promotions;
     }
 
+    public List<Type> paramTypes() {
+        List<Type> promotedTypes = new ArrayList<>(signature.paramTypes());
+        IntStream.range(0, signature.paramTypes().size())
+                .forEach(i -> {
+                    if (i < promotions.size()) {
+                        promotedTypes.set(i, promotions.get(i).apply(promotedTypes.get(i)));
+                    }
+                });
+        return promotedTypes;
+    }
+
     public Type resultType() {
         return promotions.get(promotions.size()-1).apply(signature.resultType().concreteType());
-    }
-    public List<Type> paramTypes() {
-        List<Type> promotedTypes = IntStream.range(0, paramTypes().size())
-                        .mapToObj(i -> promotions.get(i).apply(paramTypes().get(i).concreteType()))
-                        .collect(Collectors.toList());
-        return promotedTypes;
     }
     public Object getVariant() {
         return signature.getVariant();

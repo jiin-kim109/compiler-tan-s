@@ -1,0 +1,6 @@
+main {
+	const r := !(1 == 2);
+	print r \n;
+	var c := 3 >= 2;
+	print !c \n;
+}

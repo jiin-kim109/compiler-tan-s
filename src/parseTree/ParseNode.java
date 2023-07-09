@@ -47,7 +47,7 @@ public class ParseNode implements Locator {
 		this.type = type;
 	}
 	public Type getType() {
-		return type;
+		return type.concreteType();
 	}
 	@Override
 	public TextLocation getLocation() {

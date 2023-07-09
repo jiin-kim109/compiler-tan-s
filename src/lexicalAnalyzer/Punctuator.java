@@ -31,6 +31,10 @@ public enum Punctuator implements Lextant {
 	OPEN_SQUARE("["),
 	CLOSE_SQUARE("]"),
 	LIST_DELIMITER(","),
+	NOT("!"),
+	LENGTH("length"),
+	AND("&&"),
+	OR("||"),
 	TYPE_CAST(""),
 	NULL_PUNCTUATOR("");
 

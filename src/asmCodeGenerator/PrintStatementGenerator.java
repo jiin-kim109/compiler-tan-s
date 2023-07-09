@@ -43,7 +43,7 @@ public class PrintStatementGenerator {
 	}
 
 	private void appendPrintCode(ParseNode node) {
-		if (node.getType() instanceof Array) {
+		if (node.getType().concreteType() instanceof Array) {
 			printArray(node);
 			return;
 		}
@@ -88,9 +88,9 @@ public class PrintStatementGenerator {
 
 
 	private String printFormat(Type type) {
-		assert type instanceof PrimitiveType;
+		assert type.concreteType() instanceof PrimitiveType;
 
-		switch((PrimitiveType)type) {
+		switch((PrimitiveType)type.concreteType()) {
 		case INTEGER:	return RunTime.INTEGER_PRINT_FORMAT;
 		case FLOATING:	return RunTime.FLOATING_PRINT_FORMAT;
 		case BOOLEAN:	return RunTime.BOOLEAN_PRINT_FORMAT;
@@ -171,9 +171,9 @@ public class PrintStatementGenerator {
 		code.add(PushI, 16);
 		code.add(Add); // -> [length, index, addr + index * typeSize + 16]
 
-		if (arraySubType instanceof Array) {
+		if (arraySubType.concreteType() instanceof Array) {
 			code.add(LoadI);
-			printArrayRecursive(((Array) arraySubType).getSubType()); // -> [length, index, a[i]]
+			printArrayRecursive(((Array) arraySubType.concreteType()).getSubType()); // -> [length, index, a[i]]
 		}
 		else {
 			code.add(visitor.opcodeForAddress(arraySubType)); // load element, -> [length, index, element]

@@ -10,6 +10,10 @@ public class Array implements Type{
         this.subType = subType;
     }
 
+    public void setSubType(Type type) {
+        subType = type;
+    }
+
     @Override
     public int getSize() {
         return PrimitiveType.INTEGER.getSize();
@@ -22,8 +26,11 @@ public class Array implements Type{
 
     @Override
     public boolean equivalent(Type otherType) {
-        if (otherType.concreteType() instanceof Array) {
-            return getSubType().concreteType().equivalent(((Array) otherType.concreteType()).subType);
+        if (otherType instanceof Array) {
+            return getSubType().concreteType().equivalent(((Array) otherType).getSubType());
+        }
+        else if (otherType instanceof TypeVariable) {
+            return getSubType().concreteType().equivalent(otherType.concreteType());
         }
         return false;
     }

@@ -1,0 +1,7 @@
+main {
+    const b := <[int]>([3,4]);
+    const c := <[int]>([1,2]);
+    print c \n;
+	const t := <[[int]]>([b, new [int](3)]);
+	print t \n;
+}

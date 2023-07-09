@@ -19,6 +19,7 @@ import semanticAnalyzer.signatures.PromotedSignature;
 import semanticAnalyzer.types.Array;
 import semanticAnalyzer.types.PrimitiveType;
 import semanticAnalyzer.types.Type;
+import semanticAnalyzer.types.TypeVariable;
 import symbolTable.Binding;
 import symbolTable.Scope;
 import static asmCodeGenerator.codeStorage.ASMCodeFragment.CodeType.*;
@@ -150,19 +151,22 @@ public class ASMCodeGenerator {
 		}
 
 		public ASMOpcode opcodeForAddress(Type type) {
-			if(type == PrimitiveType.INTEGER) {
+			if(type.concreteType() == PrimitiveType.INTEGER) {
 				return LoadI;
 			}
-			else if(type == PrimitiveType.FLOATING) {
+			else if(type.concreteType() == PrimitiveType.FLOATING) {
 				return LoadF;
 			}
-			else if(type == PrimitiveType.BOOLEAN) {
+			else if(type.concreteType() == PrimitiveType.BOOLEAN) {
 				return LoadC;
 			}
-			else if(type == PrimitiveType.CHARACTER) {
+			else if(type.concreteType() == PrimitiveType.CHARACTER) {
 				return LoadC;
 			}
-			else if(type == PrimitiveType.STRING) {
+			else if(type.concreteType() == PrimitiveType.STRING) {
+				return LoadI;
+			}
+			else if(type.concreteType() instanceof Array) {
 				return LoadI;
 			}
 			else {

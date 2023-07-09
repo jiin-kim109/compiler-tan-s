@@ -21,6 +21,8 @@ public class FunctionSignatures extends ArrayList<FunctionSignature> {
 	private static final long serialVersionUID = -4907792488209670697L;
 	private static Map<Object, FunctionSignatures> signaturesForKey = new HashMap<Object, FunctionSignatures>();
 
+	private static List<TypeVariable> typeVariables = new ArrayList<>();
+
 	public enum Promotable {
 		PROMOTABLE,
 		NOT_PROMOTABLE
@@ -74,12 +76,16 @@ public class FunctionSignatures extends ArrayList<FunctionSignature> {
 		return signatures.acceptingSignature(types);
 	}
 
+	public static void resetTypeVariables() {
+		typeVariables.stream().forEach(tv -> tv.reset());
+	}
 
 	/////////////////////////////////////////////////////////////////////////////////
 	// Put the signatures for operators in the following static block.
 	
 	static {
 		TypeVariable T = new TypeVariable("T");
+		typeVariables.add(T);
 		// here's one example to get you started with FunctionSignatures: the signatures for addition.		
 		// for this to work, you should statically import PrimitiveType.*
 
@@ -146,6 +152,22 @@ public class FunctionSignatures extends ArrayList<FunctionSignature> {
 				new FunctionSignature(new NotEqualCodeGenerator(), CHARACTER, CHARACTER, BOOLEAN),
 				new FunctionSignature(new NotEqualCodeGenerator(), BOOLEAN, BOOLEAN, BOOLEAN),
 				new FunctionSignature(new NotEqualCodeGenerator(), STRING, STRING, BOOLEAN)
+		);
+
+		new FunctionSignatures(Punctuator.NOT, Promotable.NOT_PROMOTABLE,
+				new FunctionSignature(new NotCodeGenerator(), BOOLEAN, BOOLEAN)
+		);
+
+		new FunctionSignatures(Punctuator.LENGTH, Promotable.NOT_PROMOTABLE,
+				new FunctionSignature(new LengthCodeGenerator(), new Array(T), INTEGER)
+		);
+
+		new FunctionSignatures(Punctuator.AND, Promotable.NOT_PROMOTABLE,
+				new FunctionSignature(new AndCodeGenerator(), BOOLEAN, BOOLEAN, BOOLEAN)
+		);
+
+		new FunctionSignatures(Punctuator.OR, Promotable.NOT_PROMOTABLE,
+				new FunctionSignature(new OrCodeGenerator(), BOOLEAN, BOOLEAN, BOOLEAN)
 		);
 
 		new FunctionSignatures(Punctuator.TYPE_CAST, Promotable.NOT_PROMOTABLE,

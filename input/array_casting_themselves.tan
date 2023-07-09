@@ -1,5 +1,0 @@
-main {
-    var a := [3,4];
-	const t := <[[int]]>([<[int]>(a), new [int](3)]);
-	print t \n;
-}

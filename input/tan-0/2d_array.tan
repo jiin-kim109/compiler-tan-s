@@ -1,0 +1,6 @@
+main {
+    const b := [3,4];
+    const c := [1,2];
+	const t := [b,c,[999,998,997]];
+	print [[t:0]:1] \n;
+}

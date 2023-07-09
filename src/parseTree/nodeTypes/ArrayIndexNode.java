@@ -15,7 +15,7 @@ public class ArrayIndexNode extends ParseNode {
 	}
 
 	public static ArrayIndexNode make(Token token, ParseNode identifier, ParseNode index) {
-		assert (identifier instanceof IdentifierNode);
+		assert (identifier instanceof IdentifierNode || identifier instanceof ArrayIndexNode);
 		ArrayIndexNode node = new ArrayIndexNode(token);
 		node.appendChild(identifier);
 		node.appendChild(index);

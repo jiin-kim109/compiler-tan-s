@@ -221,29 +221,15 @@
         Jump         $$general-runtime-error   
         DLabel       $usable-memory-start      
         DLabel       $global-memory-block      
-        DataZ        16                        
+        DataZ        12                        
         Label        $$main                    
         PushD        $global-memory-block      
         PushI        0                         
-        Add                                    %% t
-        PushI        0                         
-        Nop                                    
-        PushI        3                         
-        Nop                                    
-        Exchange                               
-        Pop                                    
-        ConvertF                               
-        StoreF                                 
-        PushD        $global-memory-block      
-        PushI        8                         
-        Add                                    %% a
+        Add                                    %% b
         PushI        16                        
         DLabel       arrayLengthexpressionList0 
         DataZ        4                         
-        PushI        4                         
-        PushI        12                        
-        PushI        0                         
-        StoreI                                 
+        PushI        2                         
         Duplicate                              
         PushD        arrayLengthexpressionList0 
         Exchange                               
@@ -299,210 +285,27 @@
         Jump         -arrayDefaultValueexpressionList2-1-loopStart 
         Label        -arrayDefaultValueexpressionList2-1-loopEnd 
         Pop                                    
-        StoreI                                 
-        DLabel       arrayIndexarrayIndex0     
-        DataZ        4                         
-        PushD        arrayIndexarrayIndex0     
-        PushI        0                         
-        StoreI                                 
-        PushD        $global-memory-block      
-        PushI        8                         
-        Add                                    %% a
-        LoadI                                  
         Duplicate                              
-        PushI        12                        
-        Add                                    
-        LoadI                                  
-        PushD        arrayIndexarrayIndex0     
-        LoadI                                  
-        Duplicate                              
-        JumpNeg      $$index-out-of-bound      
-        Subtract                               
-        Duplicate                              
-        JumpNeg      $$index-out-of-bound      
-        JumpFalse    $$index-out-of-bound      
-        Duplicate                              
-        PushI        8                         
-        Add                                    
-        LoadI                                  
-        PushD        arrayIndexarrayIndex0     
-        LoadI                                  
-        Multiply                               
-        Add                                    
         PushI        16                        
         Add                                    
-        PushI        1                         
-        StoreI                                 
-        DLabel       arrayIndexarrayIndex1     
-        DataZ        4                         
-        PushD        arrayIndexarrayIndex1     
-        PushI        1                         
-        StoreI                                 
-        PushD        $global-memory-block      
-        PushI        8                         
-        Add                                    %% a
-        LoadI                                  
-        Duplicate                              
-        PushI        12                        
-        Add                                    
-        LoadI                                  
-        PushD        arrayIndexarrayIndex1     
-        LoadI                                  
-        Duplicate                              
-        JumpNeg      $$index-out-of-bound      
-        Subtract                               
-        Duplicate                              
-        JumpNeg      $$index-out-of-bound      
-        JumpFalse    $$index-out-of-bound      
-        Duplicate                              
-        PushI        8                         
-        Add                                    
-        LoadI                                  
-        PushD        arrayIndexarrayIndex1     
-        LoadI                                  
-        Multiply                               
-        Add                                    
-        PushI        16                        
-        Add                                    
-        PushI        2                         
-        StoreI                                 
-        DLabel       arrayIndexarrayIndex2     
-        DataZ        4                         
-        PushD        arrayIndexarrayIndex2     
-        PushI        2                         
-        StoreI                                 
-        PushD        $global-memory-block      
-        PushI        8                         
-        Add                                    %% a
-        LoadI                                  
-        Duplicate                              
-        PushI        12                        
-        Add                                    
-        LoadI                                  
-        PushD        arrayIndexarrayIndex2     
-        LoadI                                  
-        Duplicate                              
-        JumpNeg      $$index-out-of-bound      
-        Subtract                               
-        Duplicate                              
-        JumpNeg      $$index-out-of-bound      
-        JumpFalse    $$index-out-of-bound      
-        Duplicate                              
-        PushI        8                         
-        Add                                    
-        LoadI                                  
-        PushD        arrayIndexarrayIndex2     
-        LoadI                                  
-        Multiply                               
-        Add                                    
-        PushI        16                        
-        Add                                    
-        Label        -Operator-2-args          
-        PushI        2                         
-        Nop                                    
-        Negate                                 
-        StoreI                                 
-        DLabel       arrayIndexarrayIndex3     
-        DataZ        4                         
-        PushD        arrayIndexarrayIndex3     
         PushI        3                         
         StoreI                                 
-        PushD        $global-memory-block      
-        PushI        8                         
-        Add                                    %% a
-        LoadI                                  
         Duplicate                              
-        PushI        12                        
+        PushI        20                        
         Add                                    
-        LoadI                                  
-        PushD        arrayIndexarrayIndex3     
-        LoadI                                  
-        Duplicate                              
-        JumpNeg      $$index-out-of-bound      
-        Subtract                               
-        Duplicate                              
-        JumpNeg      $$index-out-of-bound      
-        JumpFalse    $$index-out-of-bound      
-        Duplicate                              
-        PushI        8                         
-        Add                                    
-        LoadI                                  
-        PushD        arrayIndexarrayIndex3     
-        LoadI                                  
-        Multiply                               
-        Add                                    
-        PushI        16                        
-        Add                                    
-        PushI        8                         
-        StoreI                                 
-        PushD        $global-memory-block      
-        PushI        12                        
-        Add                                    %% c
-        PushD        $global-memory-block      
-        PushI        8                         
-        Add                                    %% a
-        LoadI                                  
-        StoreI                                 
-        PushD        $global-memory-block      
-        PushI        12                        
-        Add                                    %% c
-        LoadI                                  
-        PushI        91                        
-        PushD        $print-format-character   
-        Printf                                 
-        DLabel       printArrayAddress0        
-        DataZ        4                         
-        PushD        printArrayAddress0        
-        Exchange                               
-        StoreI                                 
-        PushD        printArrayAddress0        
-        LoadI                                  
-        PushI        12                        
-        Add                                    
-        LoadI                                  
-        PushI        0                         
-        Exchange                               
-        Label        -arrayPrintLoop-3-arrayPrintLoopStartprintArrayAddress0 
-        Duplicate                              
-        JumpFalse    -arrayPrintLoop-3-arrayPrintLoopEndprintArrayAddress0 
-        Exchange                               
-        Duplicate                              
-        JumpFalse    -arrayPrintLoop-3-arrayPrintLoopNoCommaprintArrayAddress0 
-        PushI        44                        
-        PushD        $print-format-character   
-        Printf                                 
-        Label        -arrayPrintLoop-3-arrayPrintLoopNoCommaprintArrayAddress0 
-        Exchange                               
-        PushI        1                         
-        Subtract                               
-        Exchange                               
-        Duplicate                              
         PushI        4                         
-        Multiply                               
-        PushD        printArrayAddress0        
-        LoadI                                  
-        Add                                    
-        PushI        16                        
-        Add                                    
-        LoadI                                  
-        PushD        $print-format-integer     
-        Printf                                 
-        PushI        1                         
-        Add                                    
-        Exchange                               
-        Jump         -arrayPrintLoop-3-arrayPrintLoopStartprintArrayAddress0 
-        Label        -arrayPrintLoop-3-arrayPrintLoopEndprintArrayAddress0 
-        Pop                                    
-        Pop                                    
-        PushI        93                        
-        PushD        $print-format-character   
-        Printf                                 
-        PushD        $print-format-newline     
-        Printf                                 
+        PushI        12                        
+        PushI        0                         
+        StoreI                                 
+        StoreI                                 
+        StoreI                                 
+        PushD        $global-memory-block      
+        PushI        4                         
+        Add                                    %% c
         PushI        16                        
         DLabel       arrayLengthexpressionList3 
         DataZ        4                         
-        PushI        4                         
+        PushI        2                         
         Duplicate                              
         PushD        arrayLengthexpressionList3 
         Exchange                               
@@ -540,9 +343,9 @@
         StoreI                                 
         PushD        arrayLengthexpressionList3 
         LoadI                                  
-        Label        -arrayDefaultValueexpressionList5-4-loopStart 
+        Label        -arrayDefaultValueexpressionList5-2-loopStart 
         Duplicate                              
-        JumpFalse    -arrayDefaultValueexpressionList5-4-loopEnd 
+        JumpFalse    -arrayDefaultValueexpressionList5-2-loopEnd 
         PushI        1                         
         Subtract                               
         Duplicate                              
@@ -555,8 +358,8 @@
         Add                                    
         PushI        0                         
         StoreI                                 
-        Jump         -arrayDefaultValueexpressionList5-4-loopStart 
-        Label        -arrayDefaultValueexpressionList5-4-loopEnd 
+        Jump         -arrayDefaultValueexpressionList5-2-loopStart 
+        Label        -arrayDefaultValueexpressionList5-2-loopEnd 
         Pop                                    
         Duplicate                              
         PushI        16                        
@@ -567,69 +370,235 @@
         PushI        20                        
         Add                                    
         PushI        2                         
+        PushI        12                        
+        PushI        0                         
+        StoreI                                 
+        StoreI                                 
+        StoreI                                 
+        PushD        $global-memory-block      
+        PushI        8                         
+        Add                                    %% t
+        PushI        16                        
+        DLabel       arrayLengthexpressionList9 
+        DataZ        4                         
+        PushI        3                         
+        Duplicate                              
+        PushD        arrayLengthexpressionList9 
+        Exchange                               
+        StoreI                                 
+        PushI        4                         
+        Multiply                               
+        Add                                    
+        Call         -mem-manager-allocate     
+        DLabel       arrayAddressLabelexpressionList10 
+        DataZ        4                         
+        Duplicate                              
+        PushD        arrayAddressLabelexpressionList10 
+        Exchange                               
+        StoreI                                 
+        Duplicate                              
+        PushI        0                         
+        Add                                    
+        PushI        5                         
+        StoreI                                 
+        Duplicate                              
+        PushI        4                         
+        Add                                    
+        PushI        2                         
+        StoreI                                 
+        Duplicate                              
+        PushI        8                         
+        Add                                    
+        PushI        4                         
+        StoreI                                 
+        Duplicate                              
+        PushI        12                        
+        Add                                    
+        PushD        arrayLengthexpressionList9 
+        LoadI                                  
+        StoreI                                 
+        PushD        arrayLengthexpressionList9 
+        LoadI                                  
+        Label        -arrayDefaultValueexpressionList11-4-loopStart 
+        Duplicate                              
+        JumpFalse    -arrayDefaultValueexpressionList11-4-loopEnd 
+        PushI        1                         
+        Subtract                               
+        Duplicate                              
+        PushI        4                         
+        Multiply                               
+        PushI        16                        
+        Add                                    
+        PushD        arrayAddressLabelexpressionList10 
+        LoadI                                  
+        Add                                    
+        PushI        0                         
+        StoreI                                 
+        Jump         -arrayDefaultValueexpressionList11-4-loopStart 
+        Label        -arrayDefaultValueexpressionList11-4-loopEnd 
+        Pop                                    
+        Duplicate                              
+        PushI        16                        
+        Add                                    
+        PushD        $global-memory-block      
+        PushI        0                         
+        Add                                    %% b
+        LoadI                                  
+        StoreI                                 
+        Duplicate                              
+        PushI        20                        
+        Add                                    
+        PushD        $global-memory-block      
+        PushI        4                         
+        Add                                    %% c
+        LoadI                                  
         StoreI                                 
         Duplicate                              
         PushI        24                        
         Add                                    
+        PushI        16                        
+        DLabel       arrayLengthexpressionList6 
+        DataZ        4                         
         PushI        3                         
+        Duplicate                              
+        PushD        arrayLengthexpressionList6 
+        Exchange                               
+        StoreI                                 
+        PushI        4                         
+        Multiply                               
+        Add                                    
+        Call         -mem-manager-allocate     
+        DLabel       arrayAddressLabelexpressionList7 
+        DataZ        4                         
+        Duplicate                              
+        PushD        arrayAddressLabelexpressionList7 
+        Exchange                               
         StoreI                                 
         Duplicate                              
-        PushI        28                        
+        PushI        0                         
+        Add                                    
+        PushI        5                         
+        StoreI                                 
+        Duplicate                              
+        PushI        4                         
+        Add                                    
+        PushI        0                         
+        StoreI                                 
+        Duplicate                              
+        PushI        8                         
         Add                                    
         PushI        4                         
-        PushI        12                        
-        PushI        0                         
         StoreI                                 
-        StoreI                                 
-        PushI        91                        
-        PushD        $print-format-character   
-        Printf                                 
-        DLabel       printArrayAddress1        
-        DataZ        4                         
-        PushD        printArrayAddress1        
-        Exchange                               
-        StoreI                                 
-        PushD        printArrayAddress1        
-        LoadI                                  
+        Duplicate                              
         PushI        12                        
         Add                                    
+        PushD        arrayLengthexpressionList6 
         LoadI                                  
-        PushI        0                         
-        Exchange                               
-        Label        -arrayPrintLoop-5-arrayPrintLoopStartprintArrayAddress1 
+        StoreI                                 
+        PushD        arrayLengthexpressionList6 
+        LoadI                                  
+        Label        -arrayDefaultValueexpressionList8-3-loopStart 
         Duplicate                              
-        JumpFalse    -arrayPrintLoop-5-arrayPrintLoopEndprintArrayAddress1 
-        Exchange                               
-        Duplicate                              
-        JumpFalse    -arrayPrintLoop-5-arrayPrintLoopNoCommaprintArrayAddress1 
-        PushI        44                        
-        PushD        $print-format-character   
-        Printf                                 
-        Label        -arrayPrintLoop-5-arrayPrintLoopNoCommaprintArrayAddress1 
-        Exchange                               
+        JumpFalse    -arrayDefaultValueexpressionList8-3-loopEnd 
         PushI        1                         
         Subtract                               
-        Exchange                               
         Duplicate                              
         PushI        4                         
         Multiply                               
-        PushD        printArrayAddress1        
+        PushI        16                        
+        Add                                    
+        PushD        arrayAddressLabelexpressionList7 
         LoadI                                  
+        Add                                    
+        PushI        0                         
+        StoreI                                 
+        Jump         -arrayDefaultValueexpressionList8-3-loopStart 
+        Label        -arrayDefaultValueexpressionList8-3-loopEnd 
+        Pop                                    
+        Duplicate                              
+        PushI        16                        
+        Add                                    
+        PushI        999                       
+        StoreI                                 
+        Duplicate                              
+        PushI        20                        
+        Add                                    
+        PushI        998                       
+        StoreI                                 
+        Duplicate                              
+        PushI        24                        
+        Add                                    
+        PushI        997                       
+        PushI        12                        
+        PushI        0                         
+        StoreI                                 
+        StoreI                                 
+        PushI        12                        
+        PushI        0                         
+        StoreI                                 
+        StoreI                                 
+        StoreI                                 
+        DLabel       arrayIndexarrayIndex1     
+        DataZ        4                         
+        PushD        arrayIndexarrayIndex1     
+        PushI        1                         
+        StoreI                                 
+        DLabel       arrayIndexarrayIndex0     
+        DataZ        4                         
+        PushD        arrayIndexarrayIndex0     
+        PushI        0                         
+        StoreI                                 
+        PushD        $global-memory-block      
+        PushI        8                         
+        Add                                    %% t
+        LoadI                                  
+        Duplicate                              
+        PushI        12                        
+        Add                                    
+        LoadI                                  
+        PushD        arrayIndexarrayIndex0     
+        LoadI                                  
+        Duplicate                              
+        JumpNeg      $$index-out-of-bound      
+        Subtract                               
+        Duplicate                              
+        JumpNeg      $$index-out-of-bound      
+        JumpFalse    $$index-out-of-bound      
+        Duplicate                              
+        PushI        8                         
+        Add                                    
+        LoadI                                  
+        PushD        arrayIndexarrayIndex0     
+        LoadI                                  
+        Multiply                               
+        Add                                    
+        PushI        16                        
+        Add                                    
+        LoadI                                  
+        Duplicate                              
+        PushI        12                        
+        Add                                    
+        LoadI                                  
+        PushD        arrayIndexarrayIndex1     
+        LoadI                                  
+        Duplicate                              
+        JumpNeg      $$index-out-of-bound      
+        Subtract                               
+        Duplicate                              
+        JumpNeg      $$index-out-of-bound      
+        JumpFalse    $$index-out-of-bound      
+        Duplicate                              
+        PushI        8                         
+        Add                                    
+        LoadI                                  
+        PushD        arrayIndexarrayIndex1     
+        LoadI                                  
+        Multiply                               
         Add                                    
         PushI        16                        
         Add                                    
         LoadI                                  
         PushD        $print-format-integer     
-        Printf                                 
-        PushI        1                         
-        Add                                    
-        Exchange                               
-        Jump         -arrayPrintLoop-5-arrayPrintLoopStartprintArrayAddress1 
-        Label        -arrayPrintLoop-5-arrayPrintLoopEndprintArrayAddress1 
-        Pop                                    
-        Pop                                    
-        PushI        93                        
-        PushD        $print-format-character   
         Printf                                 
         PushD        $print-format-newline     
         Printf                                 

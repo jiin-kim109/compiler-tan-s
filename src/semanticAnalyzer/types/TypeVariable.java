@@ -31,13 +31,13 @@ public class TypeVariable implements Type {
 
 	@Override
 	public String infoString() {
-		return null;
+		return "TYPE VARIABLE[" + constraint.infoString() + "]";
 	}
 
 	@Override
 	public boolean equivalent(Type otherType) {
 		if (constraint == PrimitiveType.NO_TYPE) {
-			setContraint(otherType);
+			setContraint(otherType.concreteType());
 			return true;
 		}
 		return constraint.equivalent(otherType);

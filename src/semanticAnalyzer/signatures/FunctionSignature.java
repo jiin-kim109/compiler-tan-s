@@ -1,9 +1,6 @@
 package semanticAnalyzer.signatures;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import semanticAnalyzer.types.Array;
 import semanticAnalyzer.types.PrimitiveType;
@@ -43,6 +40,7 @@ public class FunctionSignature {
 	public Object getVariant() {
 		return whichVariant;
 	}
+	public List<Type> paramTypes() { return Arrays.stream(paramTypes).toList(); }
 	public Type resultType() {
 		return resultType;
 	}
@@ -73,9 +71,6 @@ public class FunctionSignature {
 
 	private boolean assignableTo(Type formalType, Type actualType) {
 		if(actualType == PrimitiveType.ERROR && ALL_TYPES_ACCEPT_ERROR_TYPES) {
-			return true;
-		}
-		else if (actualType instanceof Array && formalType instanceof Array) {
 			return true;
 		}
 		return formalType.equivalent(actualType);
