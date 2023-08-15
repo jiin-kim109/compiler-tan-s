@@ -17,6 +17,7 @@ public class RunTime {
 	public static final String BOOLEAN_TRUE_STRING    = "$boolean-true-string";
 	public static final String BOOLEAN_FALSE_STRING   = "$boolean-false-string";
 	public static final String GLOBAL_MEMORY_BLOCK    = "$global-memory-block";
+	public static final String FRAME_POINTER    = "$frame-pointer";
 	public static final String USABLE_MEMORY_START    = "$usable-memory-start";
 	public static final String MAIN_PROGRAM_LABEL     = "$$main";
 	
@@ -29,11 +30,22 @@ public class RunTime {
 
 	private ASMCodeFragment environmentASM() {
 		ASMCodeFragment result = new ASMCodeFragment(GENERATES_VOID);
+		result.append(framePointerASM());
 		result.append(jumpToMain());
 		result.append(stringsForPrintf());
 		result.append(runtimeErrors());
 		result.add(DLabel, USABLE_MEMORY_START);
 		return result;
+	}
+
+	private ASMCodeFragment framePointerASM() {
+		ASMCodeFragment frag = new ASMCodeFragment(GENERATES_VOID);
+		frag.add(DLabel, FRAME_POINTER);
+		frag.add(DataZ, 4);
+		frag.add(PushD, FRAME_POINTER);
+		frag.add(Memtop);
+		frag.add(StoreI);
+		return frag;
 	}
 	
 	private ASMCodeFragment jumpToMain() {

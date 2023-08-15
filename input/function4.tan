@@ -1,0 +1,27 @@
+subr int fin( int a, int b ){
+return pax(5*a, b) ; // legal : can reference pax before its definition.
+}
+subr int pax( int a, int b) {
+if (a < b ) {
+return a ;
+}
+return b + pax(a, 3*b) ; // legal : recursion is okay.
+}
+subr float pax( float a, float b) { // illegal : overloading is not okay.
+if (a < b ) {
+return a ;
+}
+return b + pax(a, 3*b) ; // legal, if this were a legal function : recursion is okay.
+}
+
+main {
+const a := 11;
+const b := 14;
+const c := 16;
+if( a > 5) {
+const m := pax(a, b); // legal
+const pax := pax(a, b); // also legal but bad practice
+… // in here, the function called pax is shadowed and may not be used
+}
+const x := pax(a, b); // legal to use the function pax again.
+}

@@ -1,0 +1,12 @@
+main {
+    var i := 2;
+    while ( i <= 5 ) {
+        if (i == 3) {
+            i := i + 1 ;
+            continue;
+        }
+        print i*i \s ;
+        i := i + 1 ;
+    }
+    print \n ;
+}

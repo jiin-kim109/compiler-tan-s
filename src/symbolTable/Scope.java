@@ -7,10 +7,16 @@ import semanticAnalyzer.types.Type;
 import tokens.Token;
 import symbolTable.Binding.Constancy;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 public class Scope {
 	private Scope baseScope;
 	private MemoryAllocator allocator;
 	private SymbolTable symbolTable;
+
+	private Map<String, List<Type>> parameterDefinition;
 	
 //////////////////////////////////////////////////////////////////////
 // factories
@@ -18,6 +24,7 @@ public class Scope {
 	public static Scope createProgramScope() {
 		return new Scope(programScopeAllocator(), nullInstance());
 	}
+	public static Scope createSubroutineScope(Scope baseScope) { return new Scope(subroutineScopeAllocator(), baseScope); }
 	public Scope createSubscope() {
 		return new Scope(allocator, this);
 	}
@@ -27,6 +34,13 @@ public class Scope {
 				MemoryAccessMethod.DIRECT_ACCESS_BASE, 
 				MemoryLocation.GLOBAL_VARIABLE_BLOCK);
 	}
+
+	private static MemoryAllocator subroutineScopeAllocator() {
+		return new SubroutineMemoryAllocator(
+				MemoryAccessMethod.INDIRECT_ACCESS_BASE,
+				MemoryLocation.FRAME_POINTER
+		);
+	}
 	
 //////////////////////////////////////////////////////////////////////
 // private constructor.	
@@ -34,8 +48,8 @@ public class Scope {
 		super();
 		this.baseScope = (baseScope == null) ? this : baseScope;
 		this.symbolTable = new SymbolTable();
-		
 		this.allocator = allocator;
+		this.parameterDefinition = new HashMap<>();
 		allocator.saveState();
 	}
 	
@@ -73,13 +87,18 @@ public class Scope {
 
 		return binding;
 	}
+
+	public MemoryLocation allocateEmpty(int sizeInBytes) {
+		return allocator.allocate(sizeInBytes);
+	}
+
 	private Binding allocateNewBinding(Type type, TextLocation textLocation, String lexeme, Constancy constancy) {
 		MemoryLocation memoryLocation = allocator.allocate(type.getSize());
 		return new Binding(type, textLocation, memoryLocation, lexeme, constancy);
 	}
 	
 ///////////////////////////////////////////////////////////////////////
-//toString
+
 	public String toString() {
 		String result = "scope: ";
 		result += " hash "+ hashCode() + "\n";

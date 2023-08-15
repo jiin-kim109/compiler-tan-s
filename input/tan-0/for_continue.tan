@@ -1,0 +1,9 @@
+main {
+    for(i from 2 to 5) {
+        if (i == 3) {
+            continue;
+        }
+        print i*i \s;
+    }
+    print \n ;
+}

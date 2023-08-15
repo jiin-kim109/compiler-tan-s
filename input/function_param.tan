@@ -1,0 +1,9 @@
+subr int hop (float b, float c) {
+    const a := 14;
+    print a+b+c \n;
+}
+
+main {
+    call hop(3.1, 5.4) ;
+    print "done" \n ;
+}

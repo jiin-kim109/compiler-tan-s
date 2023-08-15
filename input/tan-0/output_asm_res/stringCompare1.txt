@@ -1,1 +1,2 @@
-Error: symbol "now" defined multiple times.
+false true false
+true false true

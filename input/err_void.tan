@@ -1,0 +1,4 @@
+main {
+	const a := new [void](4);
+	print a \n;
+}

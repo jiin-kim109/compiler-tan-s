@@ -196,6 +196,29 @@
         Label        $$bad-typecast-operand    
         PushD        $errors-bad-typecast-operand 
         Jump         $$general-runtime-error   
+        DLabel       $errors-index-out-of-bound 
+        DataC        105                       %% "index out of bound"
+        DataC        110                       
+        DataC        100                       
+        DataC        101                       
+        DataC        120                       
+        DataC        32                        
+        DataC        111                       
+        DataC        117                       
+        DataC        116                       
+        DataC        32                        
+        DataC        111                       
+        DataC        102                       
+        DataC        32                        
+        DataC        98                        
+        DataC        111                       
+        DataC        117                       
+        DataC        110                       
+        DataC        100                       
+        DataC        0                         
+        Label        $$index-out-of-bound      
+        PushD        $errors-index-out-of-bound 
+        Jump         $$general-runtime-error   
         DLabel       $usable-memory-start      
         DLabel       $global-memory-block      
         DataZ        8                         
@@ -266,15 +289,33 @@
         Label        -arrayDefaultValueexpressionList2-1-loopEnd 
         Pop                                    
         StoreI                                 
+        DLabel       arrayIndexarrayIndex0     
+        DataZ        4                         
+        PushD        arrayIndexarrayIndex0     
+        PushI        0                         
+        StoreI                                 
         PushD        $global-memory-block      
         PushI        0                         
         Add                                    %% a
         LoadI                                  
         Duplicate                              
+        PushI        12                        
+        Add                                    
+        LoadI                                  
+        PushD        arrayIndexarrayIndex0     
+        LoadI                                  
+        Duplicate                              
+        JumpNeg      $$index-out-of-bound      
+        Subtract                               
+        Duplicate                              
+        JumpNeg      $$index-out-of-bound      
+        JumpFalse    $$index-out-of-bound      
+        Duplicate                              
         PushI        8                         
         Add                                    
         LoadI                                  
-        PushI        0                         
+        PushD        arrayIndexarrayIndex0     
+        LoadI                                  
         Multiply                               
         Add                                    
         PushI        16                        
@@ -352,15 +393,33 @@
         StoreI                                 
         StoreF                                 
         StoreI                                 
+        DLabel       arrayIndexarrayIndex1     
+        DataZ        4                         
+        PushD        arrayIndexarrayIndex1     
+        PushI        1                         
+        StoreI                                 
         PushD        $global-memory-block      
         PushI        0                         
         Add                                    %% a
         LoadI                                  
         Duplicate                              
+        PushI        12                        
+        Add                                    
+        LoadI                                  
+        PushD        arrayIndexarrayIndex1     
+        LoadI                                  
+        Duplicate                              
+        JumpNeg      $$index-out-of-bound      
+        Subtract                               
+        Duplicate                              
+        JumpNeg      $$index-out-of-bound      
+        JumpFalse    $$index-out-of-bound      
+        Duplicate                              
         PushI        8                         
         Add                                    
         LoadI                                  
-        PushI        1                         
+        PushD        arrayIndexarrayIndex1     
+        LoadI                                  
         Multiply                               
         Add                                    
         PushI        16                        
@@ -477,6 +536,9 @@
         PushI        44                        
         PushD        $print-format-character   
         Printf                                 
+        PushI        32                        
+        PushD        $print-format-character   
+        Printf                                 
         Label        -arrayPrintLoop-5-arrayPrintLoopNoCommaprintArrayAddress0 
         Exchange                               
         PushI        1                         
@@ -513,6 +575,9 @@
         Duplicate                              
         JumpFalse    -arrayPrintLoop-6-arrayPrintLoopNoCommaprintArrayAddress1 
         PushI        44                        
+        PushD        $print-format-character   
+        Printf                                 
+        PushI        32                        
         PushD        $print-format-character   
         Printf                                 
         Label        -arrayPrintLoop-6-arrayPrintLoopNoCommaprintArrayAddress1 
@@ -926,6 +991,9 @@
         PushI        44                        
         PushD        $print-format-character   
         Printf                                 
+        PushI        32                        
+        PushD        $print-format-character   
+        Printf                                 
         Label        -arrayPrintLoop-12-arrayPrintLoopNoCommaprintArrayAddress2 
         Exchange                               
         PushI        1                         
@@ -962,6 +1030,9 @@
         Duplicate                              
         JumpFalse    -arrayPrintLoop-13-arrayPrintLoopNoCommaprintArrayAddress3 
         PushI        44                        
+        PushD        $print-format-character   
+        Printf                                 
+        PushI        32                        
         PushD        $print-format-character   
         Printf                                 
         Label        -arrayPrintLoop-13-arrayPrintLoopNoCommaprintArrayAddress3 

@@ -19,36 +19,9 @@ public class LengthCodeGenerator extends ComparisonCodeGenerator {
         for (ASMCodeFragment arg : args) {
             result.append(arg);
         }
-        Labeller labeller = new Labeller("compare");
-        String trueLabel  = labeller.newLabel("true");
-        String falseLabel = labeller.newLabel("false");
-        String joinLabel  = labeller.newLabel("join");
-
-        Type operandType = operandType(node);
-        if (operandType == PrimitiveType.INTEGER ||
-                operandType == PrimitiveType.CHARACTER ||
-                operandType == PrimitiveType.STRING ||
-                operandType == PrimitiveType.BOOLEAN) {
-            result.add(ASMOpcode.Subtract);
-            result.add(ASMOpcode.JumpFalse, trueLabel);
-            result.add(ASMOpcode.Jump, falseLabel);
-        }
-        else if (operandType == PrimitiveType.FLOATING) {
-            result.add(ASMOpcode.FSubtract);
-            result.add(ASMOpcode.JumpFZero, trueLabel);
-            result.add(ASMOpcode.Jump, falseLabel);
-        }
-        else {
-            result.add(ASMOpcode.Jump, RunTime.BAD_COMPARISON_OPERAND_RUNTIME_ERROR);
-        }
-
-        result.add(Label, trueLabel);
-        result.add(PushI, 1);
-        result.add(Jump, joinLabel);
-        result.add(Label, falseLabel);
-        result.add(PushI, 0);
-        result.add(Jump, joinLabel);
-        result.add(Label, joinLabel);
+        result.add(PushI, 12);
+        result.add(Add);
+        result.add(LoadI);
         return result;
     }
 }

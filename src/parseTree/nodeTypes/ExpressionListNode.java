@@ -132,7 +132,6 @@ public class ExpressionListNode extends ParseNode {
 
 	public static ParseNode createEmpty(Token token, ParseNode type, ParseNode sizeExpression) {
 		assert type instanceof TypeNode;
-		assert sizeExpression instanceof IntegerConstantNode;
 		ExpressionListNode node = new ExpressionListNode(token);
 		node.appendChild(type);
 		node.appendChild(sizeExpression);

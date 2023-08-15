@@ -1,4 +1,0 @@
-main {
-    const a := "first string ;
-    print a \n;
-}

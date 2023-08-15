@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.IntStream;
 
+import asmCodeGenerator.operators.LengthCodeGenerator;
 import asmCodeGenerator.operators.TypeCastCodeGenerator;
 import lexicalAnalyzer.Keyword;
 import lexicalAnalyzer.Punctuator;
@@ -34,35 +35,175 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 	///////////////////////////////////////////////////////////////////////////
 	// constructs larger than statements
 	@Override
-	public void visitEnter(ProgramNode node) {
-		enterProgramScope(node);
-	}
+	public void visitEnter(ProgramNode node) {}
 	public void visitLeave(ProgramNode node) {
 		leaveScope(node);
 	}
-	public void visitEnter(BlockNode node) { enterSubscope(node); }
-	public void visitLeave(BlockNode node) { leaveScope(node); }
-	
-	
+
 	///////////////////////////////////////////////////////////////////////////
-	// helper methods for scoping.
-	private void enterProgramScope(ParseNode node) {
-		Scope scope = Scope.createProgramScope();
-		node.setScope(scope);
-	}	
-	@SuppressWarnings("unused")
-	private void enterSubscope(ParseNode node) {
-		Scope baseScope = node.getLocalScope();
-		Scope scope = baseScope.createSubscope();
-		node.setScope(scope);
+	// Subroutine Code
+	public void visitEnter(SubroutineNode node) {
+		enterSubroutine(node);
+	}
+	public void visitLeave(SubroutineNode node) {
+		leaveScope(node);
 	}
 
-	private void leaveScope(ParseNode node) {
-		node.getScope().leave();
+	public void visitEnter(ParameterDefinitionNode node) {
+		Scope subroutineScope = node.getLocalScope();
+
+		// Move SP down about the total size of parameters
+		List<ParameterNode> parameters = node.parameters();
+		for (ParameterNode parameter : parameters) {
+			IdentifierNode identifier = parameter.identifier();
+			TypeNode type = parameter.paramType();
+
+			Binding binding = subroutineScope.createBinding(identifier, type.getType(), Constancy.IS_VARIABLE);
+			identifier.setBinding(binding);
+		}
+		// Move SP down 4 bytes for FP direct link and 4 bytes for return address
+		subroutineScope.allocateEmpty(4 + 4);
 	}
-	
+	public void visitLeave(ParameterDefinitionNode node) {
+		/*
+		List<Type> parameterTypes = node.parameterTypes();
+		Scope subroutineScope = node.getLocalScope();
+
+		// Move SP up about the total size of parameters
+		parameterTypes.forEach(ty -> subroutineScope.allocateEmpty(-ty.getSize()));
+		// Move SP up 4 bytes for FP direct link and 4 bytes for return address
+		subroutineScope.allocateEmpty(-(4 + 4));
+		 */
+	}
+
+	public void visitEnter(ParameterNode node) {}
+	public void visitLeave(ParameterNode node) {}
+
+	///////////////////////////////////////////////////////////////////////////
+
+	public void visitEnter(ReturnStatementNode node) {}
+	public void visitLeave(ReturnStatementNode node) {
+		ParseNode returnExpression = node.child(0);
+		Type returnType = returnExpression.getType();
+		node.setType(returnType);
+
+		ParseNode subroutine = node.getParent();
+		while (!(subroutine instanceof SubroutineNode)) {
+			if (subroutine == ParseNode.NO_PARENT) {
+				semanticError("return statement must be placed within a function");
+				return;
+			}
+			subroutine = subroutine.getParent();
+		}
+		if (!returnType.equivalent(subroutine.getType())) {
+			for (Promotion promotion : Promotion.values()) {
+				if (promotion.appliesTo(returnType) && promotion.apply(returnType).equivalent(subroutine.getType())) {
+					node.setPromotion(promotion);
+					return;
+				}
+			}
+			semanticError("return type does not match with the function definition");
+		}
+	}
+
+	public void visitEnter(CallStatementNode node) {}
+	public void visitLeave(CallStatementNode node) {}
+
+	public void visitEnter(FunctionInvocationNode node) {
+		ParseNode parent = node.getParent();
+		while (!(parent instanceof SubroutineNode)) {
+			if (parent == ParseNode.NO_PARENT) {
+				node.setStackOffset(0);
+				return;
+			}
+			parent = parent.getParent();
+		}
+		Scope subroutineScope = parent.getScope();
+		node.setStackOffset(subroutineScope.getAllocatedSize());
+
+		node.resetPromotions();
+	}
+
+	public void visitLeave(FunctionInvocationNode node) {
+		IdentifierNode functionIdentifier = (IdentifierNode) node.child(0);
+		List<Type> argumentTypes = IntStream.range(1, node.nChildren()).mapToObj(i -> node.child(i).getType()).toList();
+		List<Type> paramDefinition = SubroutineNode.getSubroutineParamTypes(functionIdentifier);
+
+		if (argumentTypes.size() != paramDefinition.size()) {
+			semanticError("number of arguments given does not match with the function definition");
+			return;
+		}
+		else {
+			for (int i=0; i<argumentTypes.size(); i++) {
+				if (!argumentTypes.get(i).equivalent(paramDefinition.get(i))) {
+					boolean promotable = false;
+					for (Promotion promotion : Promotion.values()) {
+						if (promotion.appliesTo(argumentTypes.get(i)) && promotion.apply(argumentTypes.get(i)).equivalent(paramDefinition.get(i))) {
+							node.setPromotion(i, promotion);
+							promotable = true;
+							break;
+						}
+					}
+					if (!promotable) {
+						semanticError("arguments passed to function do not match with the parameter definition");
+					}
+				}
+			}
+		}
+		node.setType(functionIdentifier.getType());
+	}
+	///////////////////////////////////////////////////////////////////////////
+
+	public void visitEnter(BlockNode node) { enterSubscope(node); }
+	public void visitLeave(BlockNode node) { leaveScope(node); }
+	public void visitEnter(IfNode node) { }
+	public void visitLeave(IfNode node) {
+		ParseNode conditionNode = node.getConditionNode();
+		assert conditionNode.getType() == PrimitiveType.BOOLEAN;
+	}
+	public void visitEnter(WhileNode node) { }
+	public void visitLeave(WhileNode node) {
+		ParseNode conditionNode = node.getConditionNode();
+		assert conditionNode.getType() == PrimitiveType.BOOLEAN;
+	}
+
+	public void visitEnter(ForNode node) { }
+	public void visitLeave(ForNode node) {
+		ParseNode identifierDeclaration = node.identifierDeclaration();
+		ParseNode otherIdentifierDeclaration = node.otherIdentifierDeclaration();
+
+		if (identifierDeclaration.getType() != PrimitiveType.INTEGER || otherIdentifierDeclaration.getType() != PrimitiveType.INTEGER) {
+			semanticError("for loop bounds should have integer primitive type");
+			return;
+		}
+	}
+
 	///////////////////////////////////////////////////////////////////////////
 	// statements and declarations
+	public void visit(BreakStatementNode node) {
+		ParseNode parent = node.getParent();
+		while (!(parent instanceof LoopNode)) {
+			parent = parent.getParent();
+			if (parent == ParseNode.NO_PARENT) {
+				semanticError("break must be used within a loop");
+				return;
+			}
+		}
+		node.setParentLoop(parent);
+	}
+
+	public void visit(ContinueStatementNode node) {
+		ParseNode parent = node.getParent();
+		while (!(parent instanceof LoopNode)) {
+			parent = parent.getParent();
+			if (parent == ParseNode.NO_PARENT) {
+				semanticError("continue must be used within a loop");
+				return;
+			}
+		}
+		node.setParentLoop(parent);
+	}
+
 	@Override
 	public void visitLeave(PrintStatementNode node) {
 	}
@@ -78,8 +219,9 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 
 		Type declarationType = initializer.getType();
 		node.setType(declarationType);
+		identifier.setType(declarationType);
 
-		Constancy constancy = (node.getToken().isLextant(Keyword.CONST)) ?
+		Constancy constancy = (node.getToken().isLextant(Keyword.CONST) || node.getParent() instanceof ForNode) ?
 				Constancy.IS_CONSTANT :
 				Constancy.IS_VARIABLE;
 		addBinding(identifier, declarationType, constancy);
@@ -99,15 +241,28 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		Type expressionType = expression.getType();
 		Type identifierType = identifier.getType();
 
-		if (!expressionType.equivalent(identifierType)) {
-			semanticError("types don't match in assignment statement");
-			return;
-		}
 		if (identifier instanceof IdentifierNode && ((IdentifierNode) identifier).getBinding().isConstant()) {
 			semanticError("reassignment to const identifier");
 			return;
 		}
-		node.setType(identifierType);
+
+		if (expressionType.equivalent(identifierType)) {
+			node.setType(identifierType);
+			return;
+		}
+		else {
+			for (Promotion promotion : Promotion.allPromotions()) {
+				if (promotion.appliesTo(expressionType)) {
+					Type promotedType = promotion.apply(expressionType);
+					if (promotedType.equivalent(identifierType)) {
+						node.setType(identifierType);
+						node.setExpressionPromotion(promotion);
+						return;
+					}
+				}
+			}
+		}
+		semanticError("types don't match in assignment statement");
 	}
 
 	///////////////////////////////////////////////////////////////////////////
@@ -127,20 +282,13 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 			childTypes = Arrays.asList(left.getType(), right.getType());
 		}
 
-		if (node.getOperator() == Punctuator.TYPE_CAST && // instable code
-				node.child(0).getType() instanceof Array) {
-			if (node.child(0).getType().equivalent(node.child(1).getType())) {
-				node.setType(node.child(0).getType());
-				TypeVariable T = new TypeVariable("T");
-				node.setSignature(new PromotedSignature(new FunctionSignature(new TypeCastCodeGenerator(), new Array(T), new Array(T), new Array(T)), new ArrayList<>()));
-				FunctionSignatures.resetTypeVariables();
-				return;
-			}
-			else {
-				typeCheckError(node, childTypes);
-				node.setType(PrimitiveType.ERROR);
-				return;
-			}
+		if (node.getOperator() == Punctuator.TYPE_CAST && node.child(0).getType() instanceof Array) {
+			typecastBetweenArrays(node, childTypes);
+			return;
+		}
+		if (node.getOperator() == Punctuator.LENGTH) {
+			computeArrayLength(node);
+			return;
 		}
 
 		PromotedSignature signature = selectPromotedSignature(node, childTypes);
@@ -156,10 +304,32 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		}
 	}
 
+	public void typecastBetweenArrays(OperatorNode node, List<Type> childTypes){
+		if (node.child(0).getType().equivalent(node.child(1).getType())) {
+			node.setType(node.child(0).getType());
+			TypeVariable T = new TypeVariable("T");
+			node.setSignature(new PromotedSignature(new FunctionSignature(new TypeCastCodeGenerator(), new Array(T), new Array(T), new Array(T)), new ArrayList<>()));
+			FunctionSignatures.resetTypeVariables();
+		}
+		else {
+			typeCheckError(node, childTypes);
+			node.setType(PrimitiveType.ERROR);
+		}
+	}
+	public void computeArrayLength(OperatorNode node) {
+		assert node.child(0).getType() instanceof Array;
+		node.setType(PrimitiveType.INTEGER);
+		TypeVariable T = new TypeVariable("T");
+		node.setSignature(new PromotedSignature(new FunctionSignature(new LengthCodeGenerator(), new Array(T), PrimitiveType.INTEGER), new ArrayList<>()));
+		FunctionSignatures.resetTypeVariables();
+	}
+
 	@Override
 	public void visitLeave(ArrayIndexNode node) {
 		ParseNode identifier = node.identifier();
+		ParseNode index = node.index();
 		assert identifier.getType() instanceof Array;
+		assert index.getType() == PrimitiveType.INTEGER;
 		node.setType(((Array) identifier.getType()).getSubType());
 	}
 
@@ -241,10 +411,6 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 	@Override
 	public void visit(StringConstantNode node) { node.setType(PrimitiveType.STRING); }
 	@Override
-	public void visit(TypeNode node) {
-		node.setType(node.getType());
-	}
-	@Override
 	public void visit(NewlineNode node) {
 	}
 	@Override
@@ -259,7 +425,7 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 	// IdentifierNodes, with helper methods
 	@Override
 	public void visit(IdentifierNode node) {
-		if(!isBeingDeclared(node)) {		
+		if(!isBeingDeclared(node)) {
 			Binding binding = node.findVariableBinding();
 			node.setType(binding.getType());
 			node.setBinding(binding);

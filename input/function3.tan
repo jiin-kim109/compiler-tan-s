@@ -1,0 +1,12 @@
+subr float weight(int numHydrogen, int numOxygen) {
+    const g := 6.02E+23 ;
+    const hy := 1.008 ;
+    const ox := 15.999 ;
+    const molecularWeight := hy * numHydrogen + ox * numOxygen ;
+    print molecularWeight * g \n ;
+    return molecularWeight * g ;
+}
+
+main {
+    call weight(3.0, 2.0) ;
+}

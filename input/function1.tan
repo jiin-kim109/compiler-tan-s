@@ -1,0 +1,11 @@
+subr int hop ( ) {
+    const a := 14;
+    print "function return" \n;
+    return a ;
+    print "invalid" \n;
+}
+
+main {
+    print hop() \n;
+    print 3 \n;
+}

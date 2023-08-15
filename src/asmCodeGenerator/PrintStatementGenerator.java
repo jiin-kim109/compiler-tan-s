@@ -155,6 +155,9 @@ public class PrintStatementGenerator {
 		code.add(PushI, 44);
 		code.add(PushD, printFormat(PrimitiveType.CHARACTER));
 		code.add(Printf);
+		code.add(PushI, 32);
+		code.add(PushD, printFormat(PrimitiveType.CHARACTER));
+		code.add(Printf);
 		code.add(Label, arrayPrintNoComma);
 		code.add(Exchange); // -> [index, length]
 		// =========       =========

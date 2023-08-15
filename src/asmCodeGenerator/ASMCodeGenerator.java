@@ -16,6 +16,7 @@ import lexicalAnalyzer.Punctuator;
 import parseTree.*;
 import parseTree.nodeTypes.*;
 import semanticAnalyzer.signatures.PromotedSignature;
+import semanticAnalyzer.signatures.Promotion;
 import semanticAnalyzer.types.Array;
 import semanticAnalyzer.types.PrimitiveType;
 import semanticAnalyzer.types.Type;
@@ -179,7 +180,6 @@ public class ASMCodeGenerator {
         // convert code to value-generating code.
 		private void makeFragmentValueCode(ASMCodeFragment code, ParseNode node) {
 			assert !code.isVoid();
-			
 			if(code.isAddress()) {
 				turnAddressIntoValue(code, node);
 			}	
@@ -202,12 +202,353 @@ public class ASMCodeGenerator {
 				code.append(childCode);
 			}
 		}
+
+		///////////////////////////////////////////////////////////////////////////
+		// Subroutine Code
+		public void visitEnter(SubroutineNode node) { }
+		public void visitLeave(SubroutineNode node) {
+			newVoidCode(node);
+
+			Labeller labeller = new Labeller("subroutine-");
+			String functionEndLabel = labeller.newLabel(node.functionEndLabel());
+
+			ParseNode functionReturnTypeNode = node.child(0);
+			ParseNode functionIdentifierNode = node.child(1);
+			ParseNode parameterDefinition = node.child(2);
+			ParseNode procedureBlockNode = node.child(3);
+			ASMCodeFragment functionReturnTypeCode = removeValueCode(functionReturnTypeNode);
+			ASMCodeFragment functionIdentifierCode = removeAddressCode(functionIdentifierNode);
+			ASMCodeFragment parameterDefinitionCode = removeVoidCode(parameterDefinition);
+			ASMCodeFragment procedureBlockCode = removeVoidCode(procedureBlockNode);
+
+			int parameterOffset = 0;
+			for (ParameterNode parameter : ((ParameterDefinitionNode) parameterDefinition).parameters()) {
+				parameterOffset += parameter.paramType().getType().getSize();
+			}
+
+			code.add(PushI, -1);
+
+			// assign this subroutine's instruction address to function identifier
+			code.append(functionIdentifierCode);
+			code.add(PushPC);
+			code.add(StoreI);
+
+			code.add(Duplicate);
+			code.add(JumpNeg, functionEndLabel);
+
+			//**** start of function, [ra]
+			// (*) Store ra to starting in parameter offset + 8 bytes
+			code.add(PushD, RunTime.FRAME_POINTER);
+			code.add(LoadI);
+			code.add(PushI, parameterOffset + 4);
+			code.add(Subtract); // [ra, new_fp - arg_offset - offset_for_old_fp(4)]
+			code.add(Exchange);
+			code.add(StoreI);
+
+			//*** start of function body
+			code.append(parameterDefinitionCode);
+
+			code.append(procedureBlockCode);
+
+			// push old FP to ASM in next 4 bytes of FP
+			code.add(PushD, RunTime.FRAME_POINTER);
+			code.add(LoadI);
+			code.add(PushI, parameterOffset);
+			code.add(Subtract);
+			code.add(LoadI); // [old_fp]
+
+			// push ra to ASM in next 4-8 bytes of FP
+			code.add(PushD, RunTime.FRAME_POINTER);
+			code.add(LoadI);
+			code.add(PushI, parameterOffset + 4);
+			code.add(Subtract);
+			code.add(LoadI); // [old_fp, ra]
+
+			// move FP to old FP
+			code.add(Exchange); // [ra, old_fp]
+			code.add(PushD, RunTime.FRAME_POINTER); // [ra, old_fp, curr_fp_addr]
+			code.add(Exchange); // [ra, curr_fp_addr, old_fp]
+			code.add(StoreI); // [ra]
+
+			// Jump PC to ra
+			code.add(JumpV);
+
+			//**** end of function
+			code.add(Label, functionEndLabel);
+			code.add(Pop);
+		}
+
+		public void visitEnter(ParameterNode node) {}
+		public void visitLeave(ParameterNode node) {
+			newAddressCode(node);
+			ParseNode identifierNode = node.identifier();
+			ParseNode typeNode = node.paramType();
+			ASMCodeFragment identifierCode = removeAddressCode(identifierNode);
+			ASMCodeFragment typeCode = removeValueCode(typeNode);
+			code.append(identifierCode);
+		}
+
+		public void visitEnter(ParameterDefinitionNode node) {}
+		public void visitLeave(ParameterDefinitionNode node) {
+			newVoidCode(node);
+
+			List<ParameterNode> parameters = node.parameters();
+			List<ASMCodeFragment> parameterAddresses = new ArrayList<>();
+			for (ParameterNode parameter : parameters) {
+				ASMCodeFragment parameterAddress = removeAddressCode(parameter);
+				parameterAddresses.add(parameterAddress);
+			}
+
+			int memoryOffset = 0;
+			for (int i=0; i<node.parameters().size(); i++) {
+				IdentifierNode identifierNode = node.parameters().get(i).identifier();
+				TypeNode parameterTypeNode = node.parameters().get(i).paramType();
+				ASMCodeFragment parameterAddress = parameterAddresses.get(i);
+
+				code.append(parameterAddress);
+
+				code.add(PushD, RunTime.FRAME_POINTER);
+				code.add(LoadI);
+				code.add(PushI, memoryOffset);
+				code.add(Subtract);
+				code.add(opcodeForAddress(parameterTypeNode.getType()));
+
+				code.add(opcodeForStore(identifierNode.getType()));
+
+				memoryOffset += parameterTypeNode.getType().getSize();
+			}
+		}
+
+		public void visitEnter(ReturnStatementNode node) {}
+		public void visitLeave(ReturnStatementNode node) {
+			newVoidCode(node);
+
+			ParseNode returnValueNode = node.child(0);
+			ASMCodeFragment returnValueCode = removeValueCode(returnValueNode);
+
+			ParseNode subroutineNode = node.getParent();
+			while (!(subroutineNode instanceof SubroutineNode)) {
+				if (subroutineNode.getParent() == ParseNode.NO_PARENT) {
+					assert false;
+				}
+				subroutineNode = subroutineNode.getParent();
+			}
+
+			ParseNode parameterDefinition = subroutineNode.child(2);
+			int parameterOffset = 0;
+			for (ParameterNode parameter : ((ParameterDefinitionNode) parameterDefinition).parameters()) {
+				parameterOffset += parameter.paramType().getType().getSize();
+			}
+
+			// push old FP to ASM in next 4 bytes of FP
+			code.add(PushD, RunTime.FRAME_POINTER);
+			code.add(LoadI);
+			code.add(PushI, parameterOffset);
+			code.add(Subtract);
+			code.add(LoadI); // [old_fp]
+
+			// push ra to ASM in next 4-8 bytes of FP
+			code.add(PushD, RunTime.FRAME_POINTER);
+			code.add(LoadI);
+			code.add(PushI, parameterOffset + 4);
+			code.add(Subtract);
+			code.add(LoadI); // [old_fp, ra]
+
+			// move FP to old FP
+			code.add(Exchange); // [ra, old_fp]
+			code.add(PushD, RunTime.FRAME_POINTER); // [ra, old_fp, curr_fp_addr]
+			code.add(Exchange); // [ra, curr_fp_addr, old_fp]
+			code.add(StoreI); // [ra]
+
+			// store return value in the next 4 bytes of rollback (old_fp) FP
+			code.add(PushD, RunTime.FRAME_POINTER);
+			code.add(LoadI);
+			code.append(returnValueCode); // [ra, old_fp, reVal]
+			code.add(opcodeForStore(returnValueNode.getType()));
+
+			// Jump PC to ra
+			code.add(JumpV);
+		}
+		public void visitEnter(FunctionInvocationNode node) {
+
+		}
+		public void visitLeave(FunctionInvocationNode node) {
+			newValueCode(node);
+
+			ParseNode functionIdentifier = node.functionIdentifer();
+			List<ParseNode> arguments = node.arguments();
+
+			ASMCodeFragment functionIdentifierValueCode = removeValueCode(functionIdentifier);
+			List<ASMCodeFragment> argumentCodeList = arguments.stream().map(arg -> removeValueCode(arg)).toList();
+
+			// Push current(old) FP to ASM
+			code.add(PushD, RunTime.FRAME_POINTER);
+			code.add(LoadI); // [old_fp]
+
+			// move down FP by SP(current_offset) to set a position of new FP for a function call
+			code.add(Duplicate);
+			code.add(PushI, node.getStackOffset());
+			code.add(Subtract); // [old_fp, old_fp-stackOffset]
+			code.add(PushD, RunTime.FRAME_POINTER); // [old_fp, old_fp-stackOffset(=new_fp), fp_addr]
+			code.add(Exchange); // [old_fp, fp_addr, old_fp-stackOffset(=new_fp)]
+			code.add(StoreI); // [old_fp]
+
+			// Store arguemnts one by one below FP
+			int argOffset = 0;
+			for (int i=0; i<arguments.size(); i++) {
+				Type argType = node.promotion(i) != Promotion.NONE ?
+						node.promotion(i).apply(arguments.get(i).getType()) :
+						arguments.get(i).getType();
+				code.add(PushD, RunTime.FRAME_POINTER);
+				code.add(LoadI); // [old_fp, new_fp]
+				code.add(PushI, argOffset);
+				code.add(Subtract); // [old_fp, new_fp-arg_offset]
+				code.append(argumentCodeList.get(i)); // [old_fp, new_fp-arg_offset, arg]
+				if (node.promotion(i) != Promotion.NONE) {
+					code.append(node.promotion(i).codeFor());
+				}
+				code.add(opcodeForStore(argType)); // [old_fp]
+				argOffset += argType.getSize();
+			}
+
+			// Store old FP to starting in parameter offset + 4 bytes
+			code.add(PushD, RunTime.FRAME_POINTER);
+			code.add(LoadI);
+			code.add(PushI, argOffset); // [old_fp, new_fp, arg_offset]
+			code.add(Subtract); // [old_fp, new_fp-arg_offset]
+			code.add(Exchange); // [new_fp-arg_offset, old_fp]
+			code.add(StoreI);
+
+			// (*) Store ra to starting in parameter offset + 8 bytes
+			code.append(functionIdentifierValueCode); // Push start of function instruction (ra) to ASM
+			code.add(PushI, 1);
+			code.add(Add);
+			code.add(CallV); // [ra]
+			// argOffset += PrimitiveType.INTEGER.getSize();
+
+			// Load the next 4 bytes of FP to ASM as a return value
+			code.add(PushD, RunTime.FRAME_POINTER);
+			code.add(LoadI);
+			code.add(LoadI);
+		}
+
+		public void visitEnter(CallStatementNode node) {}
+		public void visitLeave(CallStatementNode node) {
+			newVoidCode(node);
+			ParseNode functionInvocationNode = node.child(0);
+			// remove return value from ASM
+			ASMCodeFragment functionInvocationCode = removeValueCode(functionInvocationNode);
+			code.append(functionInvocationCode);
+			code.add(Pop);
+		}
+
+		///////////////////////////////////////////////////////////////////////////
+
 		public void visitLeave(BlockNode node) {
 			newVoidCode(node);
 			for(ParseNode child : node.getChildren()) {
 				ASMCodeFragment childCode = removeVoidCode(child);
 				code.append(childCode);
 			}
+		}
+
+		public void visitLeave(IfNode node) {
+			newVoidCode(node);
+
+			ParseNode conditionNode = node.getConditionNode();
+			ParseNode statementNode = node.getStatementBlock();
+
+			ASMCodeFragment condition = removeValueCode(conditionNode);
+			ASMCodeFragment statements = removeVoidCode(statementNode);
+
+			Labeller labeller = new Labeller("if-condition");
+			String trueLabel  = labeller.newLabel("true");
+			String falseLabel = labeller.newLabel("false");
+
+			code.append(condition);
+			code.add(JumpFalse, falseLabel);
+			code.add(Label, trueLabel);
+			code.append(statements);
+			code.add(Label, falseLabel);
+
+			if (node.hasElseBlock()) {
+				ParseNode elseNode = node.getElseBlock();
+				ASMCodeFragment elseCode = removeVoidCode(elseNode);
+				code.append(elseCode);
+			}
+		}
+
+		public void visitLeave(WhileNode node) {
+			newVoidCode(node);
+
+			ParseNode conditionNode = node.getConditionNode();
+			ParseNode statementNode = node.getStatementBlock();
+
+			ASMCodeFragment condition = removeValueCode(conditionNode);
+			ASMCodeFragment statements = removeVoidCode(statementNode);
+
+			Labeller labeller = new Labeller("while-loop");
+			String conditionLabel  = labeller.newLabel("condition");
+			String exitLabel = labeller.newLabel("exit");
+
+			code.add(Label, node.getLoopStartLabel());
+			// CONDITION
+			code.add(Label, conditionLabel);
+			code.append(condition);
+			code.add(JumpFalse, exitLabel);
+			code.append(statements);
+			code.add(Jump, conditionLabel);
+			// EXIT
+			code.add(Label, exitLabel);
+			code.add(Label, node.getLoopEndLabel());
+		}
+
+		public void visitLeave(ForNode node) {
+			newVoidCode(node);
+
+			ParseNode identifierDeclaration = node.identifierDeclaration();
+			ParseNode otherIdentifierDeclaration = node.otherIdentifierDeclaration();
+			ParseNode statementBlock = node.getStatementBlock();
+
+			ASMCodeFragment identifierDeclarationCode = removeVoidCode(identifierDeclaration);
+			ASMCodeFragment otherIdentifierDeclarationCode = removeVoidCode(otherIdentifierDeclaration);
+			ASMCodeFragment statements = removeVoidCode(statementBlock);
+
+			Binding identifierBinding = node.identifier().getBinding();
+			Binding otherIdentifierBinding = node.otherIdentifier().getBinding();
+
+			Labeller labeller = new Labeller("for-condition");
+			String incrementLabel  = labeller.newLabel("increment");
+			String conditionLabel  = labeller.newLabel("condition");
+			String exitLoop  = labeller.newLabel("exit");
+
+			code.append(identifierDeclarationCode);
+			code.append(otherIdentifierDeclarationCode);
+			code.add(Jump, conditionLabel); // skip the first increment
+			code.add(Label, node.getLoopStartLabel());
+			// INCREMENT
+			code.add(Label, incrementLabel);
+			identifierBinding.generateAddress(code);
+			code.add(LoadI);
+			code.add(PushI, 1);
+			code.add(Add);
+			identifierBinding.generateAddress(code);
+			code.add(Exchange);
+			code.add(StoreI);
+			// CONDITION
+			code.add(Label, conditionLabel);
+			identifierBinding.generateAddress(code);
+			code.add(LoadI);
+			otherIdentifierBinding.generateAddress(code);
+			code.add(LoadI);
+			code.add(Subtract);
+			code.add(JumpPos, exitLoop);
+			// STATEMENT
+			code.append(statements);
+			code.add(Jump, incrementLabel);
+			// EXIT
+			code.add(Label, exitLoop);
+			code.add(Label, node.getLoopEndLabel());
 		}
 
 		///////////////////////////////////////////////////////////////////////////
@@ -251,6 +592,7 @@ public class ASMCodeGenerator {
 
 			code.append(lvalue);
 			code.append(rvalue);
+			code.append(node.getExpressionPromotion().codeFor());
 
 			Type type = node.getType();
 			code.add(opcodeForStore(type));
@@ -488,6 +830,18 @@ public class ASMCodeGenerator {
 
 		///////////////////////////////////////////////////////////////////////////
 		// leaf nodes (ErrorNode not necessary)
+		public void visit(BreakStatementNode node) {
+			newVoidCode(node);
+			LoopNode parent = (LoopNode) node.getParentLoopNode();
+			code.add(Jump, parent.getLoopEndLabel());
+		}
+
+		public void visit(ContinueStatementNode node) {
+			newVoidCode(node);
+			LoopNode parent = (LoopNode) node.getParentLoopNode();
+			code.add(Jump, parent.getLoopStartLabel());
+		}
+
 		public void visit(BooleanConstantNode node) {
 			newValueCode(node);
 			code.add(PushI, node.getValue() ? 1 : 0);

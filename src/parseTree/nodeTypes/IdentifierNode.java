@@ -14,7 +14,7 @@ public class IdentifierNode extends ParseNode {
 
 	public IdentifierNode(Token token) {
 		super(token);
-		assert(token instanceof IdentifierToken);
+		//assert(token instanceof IdentifierToken);
 		this.binding = null;
 	}
 	public IdentifierNode(ParseNode node) {

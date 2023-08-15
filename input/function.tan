@@ -1,0 +1,9 @@
+subr int hop ( ) {
+    const a := 14;
+    print a \n;
+}
+
+main {
+    call hop() ;
+    print 3 \n ;
+}

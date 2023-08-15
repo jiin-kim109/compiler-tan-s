@@ -1,0 +1,7 @@
+main {
+	var i := 'a';
+	print i \n;
+	i := 't';
+	(i) := 'c';
+	print i \n;
+}

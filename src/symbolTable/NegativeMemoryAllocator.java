@@ -25,9 +25,10 @@ public class NegativeMemoryAllocator implements MemoryAllocator {
 
 	@Override
 	public MemoryLocation allocate(int sizeInBytes) {
+		int offset = currentOffset;
 		currentOffset -= sizeInBytes;
 		updateMin();
-		return new MemoryLocation(accessor, baseAddress, currentOffset);
+		return new MemoryLocation(accessor, baseAddress, offset);
 	}
 	private void updateMin() {
 		if(minOffset > currentOffset) {

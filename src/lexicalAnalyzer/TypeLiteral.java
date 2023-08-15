@@ -12,6 +12,7 @@ public enum TypeLiteral implements Lextant {
 	BOOLEAN_TYPE("bool"),
 	CHARACTER_TYPE("char"),
 	STRING_TYPE("string"),
+	VOID_TYPE("void"),
 	NULL_TYPE("");
 
 	private String lexeme;

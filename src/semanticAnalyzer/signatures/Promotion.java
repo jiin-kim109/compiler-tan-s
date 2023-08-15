@@ -5,6 +5,9 @@ import asmCodeGenerator.codeStorage.ASMOpcode;
 import semanticAnalyzer.types.PrimitiveType;
 import semanticAnalyzer.types.Type;
 
+import java.util.Arrays;
+import java.util.List;
+
 import static semanticAnalyzer.types.PrimitiveType.*;
 
 public enum Promotion {
@@ -45,6 +48,10 @@ public enum Promotion {
 
     boolean isNull() {
         return false;
+    }
+
+    public static List<Promotion> allPromotions() {
+       return Arrays.stream(Promotion.values()).toList();
     }
 
     public ASMCodeFragment codeFor() {

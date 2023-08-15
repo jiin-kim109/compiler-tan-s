@@ -4,10 +4,13 @@ import lexicalAnalyzer.Keyword;
 import lexicalAnalyzer.Lextant;
 import parseTree.ParseNode;
 import parseTree.ParseNodeVisitor;
+import semanticAnalyzer.signatures.Promotion;
 import tokens.LextantToken;
 import tokens.Token;
 
 public class AssignmentStatementNode extends ParseNode {
+
+	private Promotion expressionPromotion = Promotion.NONE;
 
 	public AssignmentStatementNode(Token token) {
 		super(token);
@@ -26,7 +29,14 @@ public class AssignmentStatementNode extends ParseNode {
 	}
 	public LextantToken lextantToken() {
 		return (LextantToken)token;
-	}	
+	}
+
+	public void setExpressionPromotion(Promotion promotion) {
+		this.expressionPromotion = promotion;
+	}
+	public Promotion getExpressionPromotion() {
+		return this.expressionPromotion;
+	}
 	
 	
 	////////////////////////////////////////////////////////////

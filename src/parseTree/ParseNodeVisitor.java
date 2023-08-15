@@ -1,6 +1,7 @@
 package parseTree;
 
 import parseTree.nodeTypes.*;
+import symbolTable.Scope;
 
 // Visitor pattern with pre- and post-order visits
 public interface ParseNodeVisitor {
@@ -11,6 +12,13 @@ public interface ParseNodeVisitor {
 	
 	void visitEnter(BlockNode node);
 	void visitLeave(BlockNode node);
+
+	void visitEnter(IfNode node);
+	void visitLeave(IfNode node);
+	void visitEnter(WhileNode node);
+	void visitLeave(WhileNode node);
+	void visitEnter(ForNode node);
+	void visitLeave(ForNode node);
 
 	void visitEnter(DeclarationNode node);
 	void visitLeave(DeclarationNode node);
@@ -48,6 +56,23 @@ public interface ParseNodeVisitor {
 	void visit(SpaceNode node);
 	void visit(HorizontalTabNode node);
 
+	void visit(BreakStatementNode node);
+	void visit(ContinueStatementNode node);
+
+	// Subroutine
+
+	void visitEnter(SubroutineNode node);
+	void visitLeave(SubroutineNode node);
+	void visitEnter(ParameterDefinitionNode node);
+	void visitLeave(ParameterDefinitionNode node);
+	void visitEnter(ParameterNode node);
+	void visitLeave(ParameterNode node);
+	void visitEnter(FunctionInvocationNode node);
+	void visitLeave(FunctionInvocationNode node);
+	void visitEnter(ReturnStatementNode node);
+	void visitLeave(ReturnStatementNode node);
+	void visitEnter(CallStatementNode node);
+	void visitLeave(CallStatementNode node);
 
 	public static class Default implements ParseNodeVisitor
 	{
@@ -80,6 +105,24 @@ public interface ParseNodeVisitor {
 			defaultVisitEnter(node);
 		}
 		public void visitLeave(BlockNode node) {
+			defaultVisitLeave(node);
+		}
+		public void visitEnter(IfNode node) {
+			defaultVisitEnter(node);
+		}
+		public void visitLeave(IfNode node) {
+			defaultVisitLeave(node);
+		}
+		public void visitEnter(WhileNode node) {
+			defaultVisitEnter(node);
+		}
+		public void visitLeave(WhileNode node) {
+			defaultVisitLeave(node);
+		}
+		public void visitEnter(ForNode node) {
+			defaultVisitEnter(node);
+		}
+		public void visitLeave(ForNode node) {
 			defaultVisitLeave(node);
 		}
 		public void visitEnter(ParseNode node) {
@@ -130,5 +173,46 @@ public interface ParseNodeVisitor {
 		}
 		public void visit(HorizontalTabNode node) { defaultVisitForLeaf(node); }
 		public void visit(TypeNode node) { defaultVisitForLeaf(node); }
+
+		public void visit(BreakStatementNode node) { defaultVisitForLeaf(node); }
+
+		public void visit(ContinueStatementNode node) { defaultVisitForLeaf(node); }
+
+		public void visitEnter(SubroutineNode node) { defaultVisitEnter(node);}
+		public void visitLeave(SubroutineNode node) { defaultVisitLeave(node); }
+		public void visitEnter(ParameterDefinitionNode node) { defaultVisitEnter(node);}
+		public void visitLeave(ParameterDefinitionNode node) { defaultVisitLeave(node); }
+		public void visitEnter(ParameterNode node) { defaultVisitEnter(node);}
+		public void visitLeave(ParameterNode node) { defaultVisitLeave(node); }
+		public void visitEnter(FunctionInvocationNode node) { defaultVisitEnter(node);}
+		public void visitLeave(FunctionInvocationNode node) { defaultVisitLeave(node); }
+		public void visitEnter(ReturnStatementNode node) { defaultVisitEnter(node);}
+		public void visitLeave(ReturnStatementNode node) { defaultVisitLeave(node); }
+		public void visitEnter(CallStatementNode node) { defaultVisitEnter(node);}
+		public void visitLeave(CallStatementNode node) { defaultVisitLeave(node); }
+
+		///////////////////////////////////////////////////////////////////////////
+		// helper methods for scoping.
+
+		public void enterProgramScope(ParseNode node) {
+			Scope scope = Scope.createProgramScope();
+			node.setScope(scope);
+		}
+
+		public void enterSubroutine(ParseNode node) {
+			Scope baseScope = node.getLocalScope();
+			Scope scope = Scope.createSubroutineScope(baseScope);
+			node.setScope(scope);
+		}
+
+		public void enterSubscope(ParseNode node) {
+			Scope baseScope = node.getLocalScope();
+			Scope scope = baseScope.createSubscope();
+			node.setScope(scope);
+		}
+
+		public void leaveScope(ParseNode node) {
+			node.getScope().leave();
+		}
 	}
 }
