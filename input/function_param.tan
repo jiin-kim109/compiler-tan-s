@@ -1,4 +1,4 @@
-subr int hop (float b, float c) {
+subr void hop (float b, float c) {
     const a := 14;
     print a+b+c \n;
 }

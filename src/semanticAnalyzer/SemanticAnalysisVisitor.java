@@ -46,6 +46,9 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		enterSubroutine(node);
 	}
 	public void visitLeave(SubroutineNode node) {
+		if (node.getType() != PrimitiveType.NO_TYPE && !node.containsReturnStatement()) {
+			semanticError("return statement required");
+		}
 		leaveScope(node);
 	}
 
@@ -95,6 +98,8 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 			}
 			subroutine = subroutine.getParent();
 		}
+		((SubroutineNode) subroutine).setReturnStatementNode(node);
+
 		if (!returnType.equivalent(subroutine.getType())) {
 			for (Promotion promotion : Promotion.values()) {
 				if (promotion.appliesTo(returnType) && promotion.apply(returnType).equivalent(subroutine.getType())) {

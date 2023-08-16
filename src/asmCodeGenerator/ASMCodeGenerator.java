@@ -396,17 +396,12 @@ public class ASMCodeGenerator {
 			// Store arguemnts one by one below FP
 			int argOffset = 0;
 			for (int i=0; i<arguments.size(); i++) {
-				Type argType = node.promotion(i) != Promotion.NONE ?
-						node.promotion(i).apply(arguments.get(i).getType()) :
-						arguments.get(i).getType();
+				Type argType = arguments.get(i).getType();
 				code.add(PushD, RunTime.FRAME_POINTER);
 				code.add(LoadI); // [old_fp, new_fp]
 				code.add(PushI, argOffset);
 				code.add(Subtract); // [old_fp, new_fp-arg_offset]
 				code.append(argumentCodeList.get(i)); // [old_fp, new_fp-arg_offset, arg]
-				if (node.promotion(i) != Promotion.NONE) {
-					code.append(node.promotion(i).codeFor());
-				}
 				code.add(opcodeForStore(argType)); // [old_fp]
 				argOffset += argType.getSize();
 			}

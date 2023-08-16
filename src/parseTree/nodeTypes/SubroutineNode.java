@@ -24,6 +24,16 @@ public class SubroutineNode extends ParseNode {
 		return makeAddress() + "-end";
 	}
 
+	private ParseNode returnStatementNode = null;
+
+	public boolean containsReturnStatement() {
+		return returnStatementNode != null;
+	}
+	public void setReturnStatementNode(ParseNode returnStatementNode) {
+		this.returnStatementNode = returnStatementNode;
+	}
+	public ParseNode getReturnStatementNode() { return returnStatementNode; }
+
 	private static Map<String, List<Type>> parameterDefinition = new HashMap<>();
 
 	public SubroutineNode(Token token) {

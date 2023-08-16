@@ -1,12 +1,12 @@
 subr float hop ( ) {
     const a := 14;
-    const b := 1.23;
+    const b := 1;
     const c := 20;
     const d := barge( a, b, c);
     return d ;
 }
 
-subr float barge (float add1, float add2, float add3) {
+subr int barge (int add1, int add2, int add3) {
     return add1 + add2 + add3 ;
 }
 
