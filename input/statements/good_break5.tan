@@ -1,0 +1,13 @@
+
+main {
+	const min := 10;
+	const max := 100;
+	
+	for (count from <int>('a') to <int>('f')) {
+		print <char>(count) \s;
+		if(count == 'e') {
+			break;
+		}
+	}
+	print "done." \n;
+}

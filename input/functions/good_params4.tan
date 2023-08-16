@@ -1,0 +1,17 @@
+subr void holler(int r, int s) {
+	print r \s s \n;
+	
+	for(n from r to s) {
+		print n \s "Yoo hoo!!!!" \n;
+	}
+	return;
+}
+
+main {
+	call holler( 4, 8 );
+	
+	var m := 0.34;
+	call holler( 7, 10 );
+	
+	print "all done." \n;
+}

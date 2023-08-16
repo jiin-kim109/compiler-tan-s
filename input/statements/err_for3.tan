@@ -1,0 +1,8 @@
+main {
+	const a := 'a';
+	const c := 'c';
+	for i from a to c {
+		print i*i \s;
+	}
+	print \n;
+}

@@ -311,7 +311,7 @@ public class ASMCodeGenerator {
 				code.add(PushI, memoryOffset);
 				code.add(Subtract);
 				code.add(opcodeForAddress(parameterTypeNode.getType()));
-
+				code.add(PStack);
 				code.add(opcodeForStore(identifierNode.getType()));
 
 				memoryOffset += parameterTypeNode.getType().getSize();
@@ -348,7 +348,7 @@ public class ASMCodeGenerator {
 
 			// push ra to ASM in next 4-8 bytes of FP
 			code.add(PushD, RunTime.FRAME_POINTER);
-			code.add(LoadI);
+			code.add(LoadI); // [old_fp, curr_fp]
 			code.add(PushI, parameterOffset + 4);
 			code.add(Subtract);
 			code.add(LoadI); // [old_fp, ra]

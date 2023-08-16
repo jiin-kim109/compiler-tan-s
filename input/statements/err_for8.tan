@@ -1,0 +1,6 @@
+main {
+	for(i+3 from <int>('a') to 102) {
+		print 4 \s;
+	}
+	print \n;
+}

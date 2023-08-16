@@ -42,7 +42,7 @@ public class IdentifierScanner extends TokenScanner {
         if(Keyword.isAKeyword(lexeme)) {
             return Optional.of(LextantToken.make(startingCharacter, lexeme, Keyword.forLexeme(lexeme)));
         }
-        if(TypeLiteral.isATypeLiteral(lexeme)) {
+        else if(TypeLiteral.isATypeLiteral(lexeme)) {
             return Optional.of(TypeLiteralToken.make(startingCharacter, lexeme));
         }
         else {

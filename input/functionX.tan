@@ -1,13 +1,13 @@
-subr float hop ( ) {
-    const a := 14.0;
+subr float hop () {
+    const a := 3;
     const b := 1;
     const c := 20;
-    const d := barge( a, b, c);
-    return d ;
+    print a + b + c \n;
+    return 1.0;
 }
 
-subr float barge (float add1, int add2, int add3) {
-    return add1 + add2 + add3 ;
+subr float barge (int add1, int add2, int add3) {
+    return add1 + add2 + add3 + 1.0;
 }
 
 main {

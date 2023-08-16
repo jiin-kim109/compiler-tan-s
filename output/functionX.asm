@@ -235,95 +235,58 @@
         PushPC                                 
         StoreI                                 
         Duplicate                              
-        JumpNeg      -subroutine--1-subroutine0-end 
+        JumpNeg      -subroutine--3-subroutine0-end 
         PushD        $frame-pointer            
         LoadI                                  
         PushI        4                         
         Subtract                               
         Exchange                               
-        PStack                                 
         StoreI                                 
         PushD        $frame-pointer            
         LoadI                                  
         PushI        -8                        
         Add                                    %% a
-        PushF        14.000000                 
-        StoreF                                 
+        PushI        3                         
+        StoreI                                 
         PushD        $frame-pointer            
         LoadI                                  
-        PushI        -16                       
+        PushI        -12                       
         Add                                    %% b
         PushI        1                         
         StoreI                                 
         PushD        $frame-pointer            
         LoadI                                  
-        PushI        -20                       
+        PushI        -16                       
         Add                                    %% c
         PushI        20                        
         StoreI                                 
-        PushD        $frame-pointer            
-        LoadI                                  
-        PushI        -24                       
-        Add                                    %% d
-        PushD        $frame-pointer            
-        LoadI                                  
-        PushD        $frame-pointer            
-        LoadI                                  
-        PushI        -20                       
-        Add                                    %% c
-        LoadI                                  
-        PushD        $frame-pointer            
-        LoadI                                  
-        PushI        -16                       
-        Add                                    %% b
-        LoadI                                  
+        Label        -Operator-2-args          
+        Label        -Operator-1-args          
         PushD        $frame-pointer            
         LoadI                                  
         PushI        -8                        
         Add                                    %% a
-        LoadF                                  
+        LoadI                                  
+        Nop                                    
         PushD        $frame-pointer            
         LoadI                                  
-        PushI        24                        
-        Subtract                               
-        PushD        $frame-pointer            
-        Exchange                               
-        StoreI                                 
-        PushD        $frame-pointer            
+        PushI        -12                       
+        Add                                    %% b
         LoadI                                  
-        PushI        0                         
-        Subtract                               
-        Exchange                               
-        StoreF                                 
-        PushD        $frame-pointer            
-        LoadI                                  
-        PushI        8                         
-        Subtract                               
-        Exchange                               
-        StoreI                                 
-        PushD        $frame-pointer            
-        LoadI                                  
-        PushI        12                        
-        Subtract                               
-        Exchange                               
-        StoreI                                 
-        PushD        $frame-pointer            
-        LoadI                                  
-        PushI        16                        
-        Subtract                               
-        Exchange                               
-        StoreI                                 
-        PushD        $global-memory-block      
-        PushI        4                         
-        Add                                    %% barge
-        LoadI                                  
-        PushI        1                         
+        Nop                                    
         Add                                    
-        CallV                                  
+        Nop                                    
         PushD        $frame-pointer            
         LoadI                                  
-        LoadF                                  
-        StoreF                                 
+        PushI        -16                       
+        Add                                    %% c
+        LoadI                                  
+        Nop                                    
+        Add                                    
+        PushD        $print-format-integer     
+        Printf                                 
+        PushD        $print-format-newline     
+        Printf                                 
         PushD        $frame-pointer            
         LoadI                                  
         PushI        0                         
@@ -335,11 +298,7 @@
         Subtract                               
         LoadI                                  
         Exchange                               
-        PushD        $frame-pointer            
-        LoadI                                  
-        PushI        -24                       
-        Add                                    %% d
-        LoadF                                  
+        PushF        1.000000                  
         Exchange                               
         PushD        $frame-pointer            
         Exchange                               
@@ -364,7 +323,7 @@
         Exchange                               
         StoreI                                 
         JumpV                                  
-        Label        -subroutine--1-subroutine0-end 
+        Label        -subroutine--3-subroutine0-end 
         Pop                                    
         PushI        -1                        
         PushD        $global-memory-block      
@@ -373,13 +332,12 @@
         PushPC                                 
         StoreI                                 
         Duplicate                              
-        JumpNeg      -subroutine--4-subroutine1-end 
+        JumpNeg      -subroutine--7-subroutine1-end 
         PushD        $frame-pointer            
         LoadI                                  
-        PushI        20                        
+        PushI        16                        
         Subtract                               
         Exchange                               
-        PStack                                 
         StoreI                                 
         PushD        $frame-pointer            
         LoadI                                  
@@ -389,61 +347,69 @@
         LoadI                                  
         PushI        0                         
         Subtract                               
-        LoadF                                  
-        StoreF                                 
+        LoadI                                  
+        PStack                                 
+        StoreI                                 
+        PushD        $frame-pointer            
+        LoadI                                  
+        PushI        -4                        
+        Add                                    %% add2
+        PushD        $frame-pointer            
+        LoadI                                  
+        PushI        4                         
+        Subtract                               
+        LoadI                                  
+        PStack                                 
+        StoreI                                 
         PushD        $frame-pointer            
         LoadI                                  
         PushI        -8                        
-        Add                                    %% add2
+        Add                                    %% add3
         PushD        $frame-pointer            
         LoadI                                  
         PushI        8                         
         Subtract                               
         LoadI                                  
+        PStack                                 
         StoreI                                 
-        PushD        $frame-pointer            
-        LoadI                                  
-        PushI        -12                       
-        Add                                    %% add3
         PushD        $frame-pointer            
         LoadI                                  
         PushI        12                        
         Subtract                               
         LoadI                                  
-        StoreI                                 
         PushD        $frame-pointer            
         LoadI                                  
         PushI        16                        
         Subtract                               
         LoadI                                  
-        PushD        $frame-pointer            
-        LoadI                                  
-        PushI        20                        
-        Subtract                               
-        LoadI                                  
         Exchange                               
-        Label        -Operator-3-args          
-        Label        -Operator-2-args          
+        Label        -Operator-6-args          
+        Label        -Operator-5-args          
+        Label        -Operator-4-args          
         PushD        $frame-pointer            
         LoadI                                  
         PushI        0                         
         Add                                    %% add1
-        LoadF                                  
+        LoadI                                  
+        Nop                                    
+        PushD        $frame-pointer            
+        LoadI                                  
+        PushI        -4                        
+        Add                                    %% add2
+        LoadI                                  
+        Nop                                    
+        Add                                    
         Nop                                    
         PushD        $frame-pointer            
         LoadI                                  
         PushI        -8                        
-        Add                                    %% add2
-        LoadI                                  
-        ConvertF                               
-        FAdd                                   
-        Nop                                    
-        PushD        $frame-pointer            
-        LoadI                                  
-        PushI        -12                       
         Add                                    %% add3
         LoadI                                  
+        Nop                                    
+        Add                                    
         ConvertF                               
+        PushF        1.000000                  
+        Nop                                    
         FAdd                                   
         Exchange                               
         PushD        $frame-pointer            
@@ -456,12 +422,12 @@
         JumpV                                  
         PushD        $frame-pointer            
         LoadI                                  
-        PushI        16                        
+        PushI        12                        
         Subtract                               
         LoadI                                  
         PushD        $frame-pointer            
         LoadI                                  
-        PushI        20                        
+        PushI        16                        
         Subtract                               
         LoadI                                  
         Exchange                               
@@ -469,7 +435,7 @@
         Exchange                               
         StoreI                                 
         JumpV                                  
-        Label        -subroutine--4-subroutine1-end 
+        Label        -subroutine--7-subroutine1-end 
         Pop                                    
         PushD        $frame-pointer            
         LoadI                                  

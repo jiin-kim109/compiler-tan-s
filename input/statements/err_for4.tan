@@ -1,0 +1,7 @@
+main {
+	const a := 'a';
+	const c := 'c';
+	for ( i from <int>(a) to <int>(c) ) 
+		print i*i \s;
+	print \n;
+}

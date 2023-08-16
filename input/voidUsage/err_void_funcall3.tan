@@ -1,0 +1,14 @@
+subr int printXNum(int x) {
+	print "###" \ x;
+	return 5;
+}
+
+subr void empty() {
+}
+
+main {
+	const max := 77;
+	const range := empty();
+	call printXNum(max);
+}
+
