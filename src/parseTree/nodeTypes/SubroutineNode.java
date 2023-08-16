@@ -35,6 +35,7 @@ public class SubroutineNode extends ParseNode {
 	public ParseNode getReturnStatementNode() { return returnStatementNode; }
 
 	private static Map<String, List<Type>> parameterDefinition = new HashMap<>();
+	private static Map<String, Type> functionReturnTypes = new HashMap<>();
 
 	public SubroutineNode(Token token) {
 		super(token);
@@ -57,6 +58,19 @@ public class SubroutineNode extends ParseNode {
 		String lexeme = token.getLexeme();
 		assert parameterDefinition.containsKey(lexeme);
 		return parameterDefinition.get(lexeme);
+	}
+
+	public static void setFunctionReturnTypes(IdentifierNode functionIdentifier, Type returnType) {
+		Token token = functionIdentifier.getToken();
+		String lexeme = token.getLexeme();
+		functionReturnTypes.put(lexeme, returnType);
+	}
+
+	public static Type getFunctionReturnType(IdentifierNode functionIdentifier) {
+		Token token = functionIdentifier.getToken();
+		String lexeme = token.getLexeme();
+		assert functionReturnTypes.containsKey(lexeme);
+		return functionReturnTypes.get(lexeme);
 	}
 
 	///////////////////////////////////////////////////////////

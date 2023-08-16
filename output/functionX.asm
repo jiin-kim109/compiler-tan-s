@@ -241,6 +241,7 @@
         PushI        4                         
         Subtract                               
         Exchange                               
+        PStack                                 
         StoreI                                 
         PushD        $frame-pointer            
         LoadI                                  
@@ -252,30 +253,30 @@
         LoadI                                  
         PushI        -16                       
         Add                                    %% b
-        PushF        1.230000                  
-        StoreF                                 
+        PushI        1                         
+        StoreI                                 
         PushD        $frame-pointer            
         LoadI                                  
-        PushI        -24                       
+        PushI        -20                       
         Add                                    %% c
         PushI        20                        
         StoreI                                 
         PushD        $frame-pointer            
         LoadI                                  
-        PushI        -28                       
+        PushI        -24                       
         Add                                    %% d
         PushD        $frame-pointer            
         LoadI                                  
         PushD        $frame-pointer            
         LoadI                                  
-        PushI        -24                       
+        PushI        -20                       
         Add                                    %% c
         LoadI                                  
         PushD        $frame-pointer            
         LoadI                                  
         PushI        -16                       
         Add                                    %% b
-        LoadF                                  
+        LoadI                                  
         PushD        $frame-pointer            
         LoadI                                  
         PushI        -8                        
@@ -283,7 +284,7 @@
         LoadF                                  
         PushD        $frame-pointer            
         LoadI                                  
-        PushI        28                        
+        PushI        24                        
         Subtract                               
         PushD        $frame-pointer            
         Exchange                               
@@ -299,16 +300,16 @@
         PushI        8                         
         Subtract                               
         Exchange                               
-        StoreF                                 
+        StoreI                                 
         PushD        $frame-pointer            
         LoadI                                  
-        PushI        16                        
+        PushI        12                        
         Subtract                               
         Exchange                               
         StoreI                                 
         PushD        $frame-pointer            
         LoadI                                  
-        PushI        20                        
+        PushI        16                        
         Subtract                               
         Exchange                               
         StoreI                                 
@@ -336,7 +337,7 @@
         Exchange                               
         PushD        $frame-pointer            
         LoadI                                  
-        PushI        -28                       
+        PushI        -24                       
         Add                                    %% d
         LoadF                                  
         Exchange                               
@@ -375,9 +376,10 @@
         JumpNeg      -subroutine--4-subroutine1-end 
         PushD        $frame-pointer            
         LoadI                                  
-        PushI        24                        
+        PushI        20                        
         Subtract                               
         Exchange                               
+        PStack                                 
         StoreI                                 
         PushD        $frame-pointer            
         LoadI                                  
@@ -397,26 +399,26 @@
         LoadI                                  
         PushI        8                         
         Subtract                               
-        LoadF                                  
-        StoreF                                 
+        LoadI                                  
+        StoreI                                 
         PushD        $frame-pointer            
         LoadI                                  
-        PushI        -16                       
+        PushI        -12                       
         Add                                    %% add3
         PushD        $frame-pointer            
         LoadI                                  
-        PushI        16                        
+        PushI        12                        
         Subtract                               
         LoadI                                  
         StoreI                                 
         PushD        $frame-pointer            
         LoadI                                  
-        PushI        20                        
+        PushI        16                        
         Subtract                               
         LoadI                                  
         PushD        $frame-pointer            
         LoadI                                  
-        PushI        24                        
+        PushI        20                        
         Subtract                               
         LoadI                                  
         Exchange                               
@@ -432,13 +434,13 @@
         LoadI                                  
         PushI        -8                        
         Add                                    %% add2
-        LoadF                                  
-        Nop                                    
+        LoadI                                  
+        ConvertF                               
         FAdd                                   
         Nop                                    
         PushD        $frame-pointer            
         LoadI                                  
-        PushI        -16                       
+        PushI        -12                       
         Add                                    %% add3
         LoadI                                  
         ConvertF                               
@@ -454,12 +456,12 @@
         JumpV                                  
         PushD        $frame-pointer            
         LoadI                                  
-        PushI        20                        
+        PushI        16                        
         Subtract                               
         LoadI                                  
         PushD        $frame-pointer            
         LoadI                                  
-        PushI        24                        
+        PushI        20                        
         Subtract                               
         LoadI                                  
         Exchange                               

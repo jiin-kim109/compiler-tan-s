@@ -3,6 +3,8 @@ package parseTree.nodeTypes;
 import parseTree.ParseNode;
 import parseTree.ParseNodeVisitor;
 import logging.TanLogger;
+import semanticAnalyzer.types.PrimitiveType;
+import semanticAnalyzer.types.Type;
 import symbolTable.Binding;
 import symbolTable.Scope;
 import tokens.IdentifierToken;
@@ -30,7 +32,7 @@ public class IdentifierNode extends ParseNode {
 	
 ////////////////////////////////////////////////////////////
 // attributes
-	
+
 	public IdentifierToken identifierToken() {
 		return (IdentifierToken)token;
 	}

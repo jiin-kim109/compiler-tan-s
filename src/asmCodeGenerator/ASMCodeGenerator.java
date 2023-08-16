@@ -306,7 +306,6 @@ public class ASMCodeGenerator {
 				ASMCodeFragment parameterAddress = parameterAddresses.get(i);
 
 				code.append(parameterAddress);
-
 				code.add(PushD, RunTime.FRAME_POINTER);
 				code.add(LoadI);
 				code.add(PushI, memoryOffset);
@@ -353,17 +352,21 @@ public class ASMCodeGenerator {
 			code.add(PushI, parameterOffset + 4);
 			code.add(Subtract);
 			code.add(LoadI); // [old_fp, ra]
+			code.add(Exchange); // [ra, old_fp]
+
+			// push return value to ASM
+			code.append(returnValueCode); // [ra, old_fp, reVal]
+			code.add(Exchange); // [ra, reVal, old_fp]
 
 			// move FP to old FP
-			code.add(Exchange); // [ra, old_fp]
-			code.add(PushD, RunTime.FRAME_POINTER); // [ra, old_fp, curr_fp_addr]
-			code.add(Exchange); // [ra, curr_fp_addr, old_fp]
-			code.add(StoreI); // [ra]
+			code.add(PushD, RunTime.FRAME_POINTER); // [ra, reVal, old_fp, curr_fp_addr]
+			code.add(Exchange); // [ra, reVal, curr_fp_addr, old_fp]
+			code.add(StoreI); // [ra, reVal]
 
 			// store return value in the next 4 bytes of rollback (old_fp) FP
 			code.add(PushD, RunTime.FRAME_POINTER);
-			code.add(LoadI);
-			code.append(returnValueCode); // [ra, old_fp, reVal]
+			code.add(LoadI); // [ra, reVal, old_fp]
+			code.add(Exchange); // [ra, old_fp, reVal]
 			code.add(opcodeForStore(returnValueNode.getType()));
 
 			// Jump PC to ra
@@ -385,23 +388,29 @@ public class ASMCodeGenerator {
 			code.add(PushD, RunTime.FRAME_POINTER);
 			code.add(LoadI); // [old_fp]
 
+			// Push arguments to ASM
+			for (int i=arguments.size()-1; i>=0; i--) {
+				code.append(argumentCodeList.get(i)); // [old_fp, ...arguments]
+			}
+
 			// move down FP by SP(current_offset) to set a position of new FP for a function call
-			code.add(Duplicate);
+			code.add(PushD, RunTime.FRAME_POINTER);
+			code.add(LoadI); // [old_fp]
 			code.add(PushI, node.getStackOffset());
-			code.add(Subtract); // [old_fp, old_fp-stackOffset]
-			code.add(PushD, RunTime.FRAME_POINTER); // [old_fp, old_fp-stackOffset(=new_fp), fp_addr]
-			code.add(Exchange); // [old_fp, fp_addr, old_fp-stackOffset(=new_fp)]
-			code.add(StoreI); // [old_fp]
+			code.add(Subtract); // [old_fp, ...arguments, old_fp-stackOffset]
+			code.add(PushD, RunTime.FRAME_POINTER); // [old_fp, ...arguments, old_fp-stackOffset(=new_fp), fp_addr]
+			code.add(Exchange); // [old_fp, ...arguments, fp_addr, old_fp-stackOffset(=new_fp)]
+			code.add(StoreI); // [old_fp, ...arguments]
 
 			// Store arguemnts one by one below FP
 			int argOffset = 0;
 			for (int i=0; i<arguments.size(); i++) {
 				Type argType = arguments.get(i).getType();
 				code.add(PushD, RunTime.FRAME_POINTER);
-				code.add(LoadI); // [old_fp, new_fp]
+				code.add(LoadI); // [old_fp, ...arguments, new_fp]
 				code.add(PushI, argOffset);
-				code.add(Subtract); // [old_fp, new_fp-arg_offset]
-				code.append(argumentCodeList.get(i)); // [old_fp, new_fp-arg_offset, arg]
+				code.add(Subtract); // [old_fp, ...arguments-1, arg, new_fp-arg_offset]
+				code.add(Exchange); // [old_fp, ...arguments-1, new_fp-arg_offset, arg]
 				code.add(opcodeForStore(argType)); // [old_fp]
 				argOffset += argType.getSize();
 			}
@@ -422,9 +431,11 @@ public class ASMCodeGenerator {
 			// argOffset += PrimitiveType.INTEGER.getSize();
 
 			// Load the next 4 bytes of FP to ASM as a return value
-			code.add(PushD, RunTime.FRAME_POINTER);
-			code.add(LoadI);
-			code.add(LoadI);
+			if (node.getType() != PrimitiveType.NO_TYPE) {
+				code.add(PushD, RunTime.FRAME_POINTER);
+				code.add(LoadI);
+				code.add(opcodeForAddress(node.getType()));
+			}
 		}
 
 		public void visitEnter(CallStatementNode node) {}
@@ -434,7 +445,9 @@ public class ASMCodeGenerator {
 			// remove return value from ASM
 			ASMCodeFragment functionInvocationCode = removeValueCode(functionInvocationNode);
 			code.append(functionInvocationCode);
-			code.add(Pop);
+			if (functionInvocationNode.getType() != PrimitiveType.NO_TYPE) {
+				code.add(Pop);
+			}
 		}
 
 		///////////////////////////////////////////////////////////////////////////

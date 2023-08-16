@@ -27,12 +27,14 @@ public class GlobalVariableVisitor extends ParseNodeVisitor.Default {
 
         Type returnType = returnTypeNode.getType();
         List<Type> parameterTypes = parameterDefinition.parameterTypes();
-        SubroutineNode.setSubroutineParamTypes(functionIdentifier, parameterTypes);
-        node.setType(returnType);
 
         Scope globalScope = node.getLocalScope();
         Binding binding = globalScope.createBinding(functionIdentifier, PrimitiveType.INTEGER, Binding.Constancy.IS_CONSTANT);
         functionIdentifier.setBinding(binding);
+
+        SubroutineNode.setSubroutineParamTypes(functionIdentifier, parameterTypes);
+        SubroutineNode.setFunctionReturnTypes(functionIdentifier, returnType);
+        node.setType(returnType);
     }
 
     public void visitEnter(ParameterDefinitionNode node) {}

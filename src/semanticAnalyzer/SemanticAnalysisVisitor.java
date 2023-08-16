@@ -141,21 +141,12 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		else {
 			for (int i=0; i<argumentTypes.size(); i++) {
 				if (!argumentTypes.get(i).equivalent(paramDefinition.get(i))) {
-					boolean promotable = false;
-					for (Promotion promotion : Promotion.values()) {
-						if (promotion.appliesTo(argumentTypes.get(i)) && promotion.apply(argumentTypes.get(i)).equivalent(paramDefinition.get(i))) {
-							node.setPromotion(i, promotion);
-							promotable = true;
-							break;
-						}
-					}
-					if (!promotable) {
-						semanticError("arguments passed to function do not match with the parameter definition");
-					}
+					semanticError("arguments passed to function do not match with the parameter definition");
+					return;
 				}
 			}
 		}
-		node.setType(functionIdentifier.getType());
+		node.setType(SubroutineNode.getFunctionReturnType(functionIdentifier));
 	}
 	///////////////////////////////////////////////////////////////////////////
 
@@ -221,6 +212,11 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		
 		IdentifierNode identifier = (IdentifierNode) node.child(0);
 		ParseNode initializer = node.child(1);
+
+		if (initializer.getType() == PrimitiveType.NO_TYPE) {
+			semanticError("cannot declare with non type initializer.");
+			return;
+		}
 
 		Type declarationType = initializer.getType();
 		node.setType(declarationType);
