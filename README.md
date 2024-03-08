@@ -1,8 +1,8 @@
-### Commands
-
 The frontend and backend of a compiler for Tan-S.  
 
 The barebone of this code is provided by [Thomas Shermer](https://www.sfu.ca/computing/people/faculty/thomasshermer.html) which you can find in the [initial commit](https://github.com/jiin-kim109/compiler-tan-s/commit/a78a932237520da9f8f26f67c150837f8ee761ae)  
+
+### Commands 
 
 **Running regression testing**  
 `
